@@ -1,8 +1,9 @@
+// use client это директива для next.js указвает что компонент для клиентской стороны, а не серверной
 'use client';
 
 import { useState } from 'react';
 import { Image } from 'lucide-react';
-
+// поля с данными для формы создания мероприятия
 export default function CreateEventPage() {
   const [formData, setFormData] = useState({
     title: '',
@@ -16,7 +17,7 @@ export default function CreateEventPage() {
     image: null,
   });
 
-
+// обработка изменения полей формы
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -27,7 +28,7 @@ export default function CreateEventPage() {
     // тут обработка отправки формы, например, отправка данных на сервер
     console.log(formData);
   }
-
+// return разметки страницы создания мероприятия
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
       {/* заголовок страницы */}
@@ -69,9 +70,9 @@ export default function CreateEventPage() {
                 required
                 maxLength={1000}
                 rows={5}
-                className="w-full px-4 py-3 pb-8 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 resize-y"
+                className="w-full px-4 py-3 pb-8 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-[#2563EB] resize-y"
               />
-              <span className="absolute bottom-3 right-3 text-xs text-gray-400">
+              <span className="absolute bottom-3 right-3 text-xs text-[#64748B] ">
                 {formData.description?.length || 0}/1000
               </span>
             </div>
@@ -89,9 +90,10 @@ export default function CreateEventPage() {
                 value={formData.date}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 text-gray-600"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-[#2563EB] text-gray-600"
               />
             </div>
+            {/* Время */}
             <div>
               <label className="block text-sm font-semibold mb-2 opacity-0 hidden sm:block">Время</label>
               <input
@@ -100,7 +102,7 @@ export default function CreateEventPage() {
                 value={formData.time}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 text-gray-600"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-[#2563EB] text-gray-600"
               />
             </div>
           </div>
@@ -117,7 +119,7 @@ export default function CreateEventPage() {
               onChange={handleChange}
               placeholder="Например, Москва, ул. Покровка, 47"
               required
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-[#2563EB]"
             />
           </div>
 
@@ -132,7 +134,7 @@ export default function CreateEventPage() {
                 value={formData.category}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-[#2563EB]"
               >
                 <option value="">Выберите категорию</option>
                 <option value="concert">Концерт</option>
@@ -152,7 +154,7 @@ export default function CreateEventPage() {
                 onChange={handleChange}
                 placeholder="Например, 500"
                 required
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-[#2563EB]"
               />
             </div>
             {/* количество мест */}
@@ -167,7 +169,7 @@ export default function CreateEventPage() {
                 onChange={handleChange}
                 placeholder="Например, 100"
                 required
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-[#2563EB]"
               />
             </div>
           </div>
@@ -184,7 +186,7 @@ export default function CreateEventPage() {
 
           <label className="flex flex-col items-center justify-center h-90 px-6 border-2 border-dashed border-gray-300 rounded-2xl cursor-pointer bg-gray-50/50 hover:bg-gray-50 transition-colors">
             <div className="flex flex-col items-center text-center">
-              <div className="w-16 h-16 mb-4 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
+              <div className="w-16 h-16 mb-4 rounded-2xl bg-blue-50 text-[#2563EB] flex items-center justify-center">
                 <Image className="w-8 h-8" />
               </div>
               <p className="text-base font-semibold text-[#64748B] mb-1">Загрузите изображение</p>
@@ -199,10 +201,10 @@ export default function CreateEventPage() {
 
       {/* панель с кнопкамми */}
       <div className="flex items-center justify-between mt-12 pt-6 border-t border-gray-100">
-        <button type="button" className="text-blue-600 font-medium hover:underline flex items-center gap-2 ">
+        <button type="button" className="text-[#2563EB] font-medium hover:underline flex items-center gap-2 ">
           ← Отмена
         </button>
-        <button type="submit" className="px-6 py-3 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 transition-colors">
+        <button type="submit" className="px-6 py-3 bg-[#2563EB] text-white font-medium rounded-xl hover:bg-[#1D4ED8] transition-colors">
           Создать мероприятие
         </button>
       </div>
