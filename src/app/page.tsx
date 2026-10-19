@@ -7,11 +7,18 @@ import { Search, CalendarDays, MapPin, CircleDollarSign, UsersRound } from 'luci
 export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState('')
   const eventsArray = Array.isArray(mockEvents) ? mockEvents : (mockEvents.events || []);
-
+  const [selectedCategory, setSelectedCategory] = useState('')
   const filteredEvents = eventsArray.filter((event: any) => {
-    if (!event || !event.title) return false;
-    return event.title.toLowerCase().trim().includes(searchQuery.toLowerCase().trim())
+    if (!event) return false 
+
+    const matchesSearch = event.title 
+    ? event.title.toLowerCase().trim().includes(searchQuery.toLowerCase().trim())
+    : false;
+    const matchesCategory = selectedCategory === '' ? true: event.category === selectedCategory;
+    return matchesSearch && matchesCategory
   })
+  // const [sortedEvents, setSortedEvents] = useState ( '')
+  // const sortedEvents = eventsArray.sorted((event: any) =>
 
   return (
     <div className="flex flex-col min-h-screen bg-[#FAFAFA] font-sans">
@@ -49,7 +56,7 @@ export default function HomePage() {
           <div className="flex flex-col sm:flex-row gap-4 md:gap-5 flex-1 w-full">
             <label htmlFor="select-category" className="flex flex-col gap-[6px] flex-1 text-[#334155] text-sm font-semibold"> 
               Все категории
-              <select name="category" id="select-category" className="w-full p-3 rounded-lg border border-[#CBD5E1] bg-white text-[#0F172A] text-[15px] cursor-pointer outline-none focus:border-[#2563EB] transition-colors">
+              <select value= {selectedCategory} onChange = {(e) => setSelectedCategory(e.target.value)} name="category" id="select-category" className="w-full p-3 rounded-lg border border-[#CBD5E1] bg-white text-[#0F172A] text-[15px] cursor-pointer outline-none focus:border-[#2563EB] transition-colors">
                 <option value="">Все категории</option>
                 <option value="concert">Театр и шоу</option>
                 <option value="cinema">Кино</option>
@@ -66,7 +73,10 @@ export default function HomePage() {
             <label htmlFor="select-near" className="flex flex-col gap-[6px] flex-1 text-[#334155] text-sm font-semibold">
               Сортировка
               <select name="near" id="select-near" className="w-full p-3 rounded-lg border border-[#CBD5E1] bg-white text-[#0F172A] text-[15px] cursor-pointer outline-none focus:border-[#2563EB] transition-colors">
-                <option value="soon">Сначала ближайшие</option>
+                <option value="date-ask">Сначала ближайшие</option>
+                <option value="price-ask">Сначала дешевле</option>
+                <option value="price-desc">Сначала дороже</option>
+                <option value="seats-desk">Много мест</option>
               </select>
             </label>
           </div>
