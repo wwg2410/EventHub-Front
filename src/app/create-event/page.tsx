@@ -32,7 +32,7 @@ export default function CreateEventPage() {
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
       {/* заголовок страницы */}
-      <h1 className="text-[#0F172A] text-3xl font-bold mb-2 ">Сздайте мероприятие</h1>
+      <h1 className="text-[#0F172A] text-3xl font-bold mb-2 ">Создайте мероприятие</h1>
       <p className="text-[#64748B] mb-8">Расскажите о вашем мероприятии, чтобы привлечь участников</p>
 
       <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
