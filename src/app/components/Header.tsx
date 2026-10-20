@@ -49,6 +49,12 @@ export default function Header() {
           >
             <Search size={18} strokeWidth={1.8} />
           </Link>
+          <Link
+            href="/admin-panel"
+            className="hidden rounded-lg border border-blue-200 px-3 py-2 text-sm font-semibold text-blue-700 transition-colors hover:bg-blue-50 sm:inline-flex sm:px-4"
+          >
+            Админ-панель
+          </Link>
           {/* TODO: заменить временные ссылки на маршруты авторизации после их добавления. */}
           <Link href="/login" className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 hover:text-blue-600 sm:px-4">Войти</Link>
           <Link href="/register" className="rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700 sm:px-4">Регистрация</Link>
