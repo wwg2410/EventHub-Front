@@ -201,7 +201,7 @@ const [imagePreview, setImagePreview] = useState<string | null>(null);
         </div>
 
        {/* правый блок с фотографиями */}
-       
+
         <div className="space-y-2">
           <label className="block text-[#0F172A] text-sm font-semibold mb-2">
             Изображение мероприятия <span className="text-red-500">*</span>
@@ -252,9 +252,9 @@ const [imagePreview, setImagePreview] = useState<string | null>(null);
 
       {/* панель с кнопкамми */}
       <div className="flex items-center justify-between mt-12 pt-6 border-t border-gray-100">
-        <link type="button" className="text-[#2563EB] font-medium hover:underline flex items-center gap-2 ">
+        <Link href="/" className="text-[#2563EB] font-medium hover:underline flex items-center gap-2 ">
           ← Отмена
-        </link>
+        </Link>
         <button type="submit" className="px-6 py-3 bg-[#2563EB] text-white font-medium rounded-xl hover:bg-[#1D4ED8] transition-colors">
           Создать мероприятие
         </button>
