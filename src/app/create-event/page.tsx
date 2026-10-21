@@ -2,7 +2,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Image } from 'lucide-react';
+import { Image, X } from 'lucide-react';
+import Link from 'next/link';
 // поля с данными для формы создания мероприятия
 export default function CreateEventPage() {
   const [formData, setFormData] = useState({
@@ -14,14 +15,37 @@ export default function CreateEventPage() {
     category: '',
     price: '',
     seats: '',
-    image: null,
+    image: null as File | null,
   });
+
+const [imagePreview, setImagePreview] = useState<string | null>(null);  
+
+
 
 // обработка изменения полей формы
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
+
+  // Обработка загрузки файла изображения
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setFormData((prev) => ({ ...prev, image: file }));
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreview(previewUrl);
+    }
+  };
+
+  // Удаление выбранной картинки
+  const handleRemoveImage = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setFormData((prev) => ({ ...prev, image: null }));
+    setImagePreview(null);
+  };
+
+
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -176,24 +200,51 @@ export default function CreateEventPage() {
 
         </div>
 
-        {/* правый блок с фотографиями  */}
-
-        {/* добавление изображения */}
+       {/* правый блок с фотографиями */}
+       
         <div className="space-y-2">
-          <label className="block  text[#0F172A]text-sm font-semibold mb-2">
+          <label className="block text-[#0F172A] text-sm font-semibold mb-2">
             Изображение мероприятия <span className="text-red-500">*</span>
           </label>
 
-          <label className="flex flex-col items-center justify-center h-90 px-6 border-2 border-dashed border-gray-300 rounded-2xl cursor-pointer bg-gray-50/50 hover:bg-gray-50 transition-colors">
-            <div className="flex flex-col items-center text-center">
-              <div className="w-16 h-16 mb-4 rounded-2xl bg-blue-50 text-[#2563EB] flex items-center justify-center">
-                <Image className="w-8 h-8" />
+          <label className="relative flex flex-col items-center justify-center h-[380px] px-6 border-2 border-dashed border-gray-300 rounded-2xl cursor-pointer bg-gray-50/50 hover:bg-gray-50 transition-colors overflow-hidden">
+            {imagePreview ? (
+              <>
+                {/* Превьюшка новой картинки */}
+                <img 
+                  src={imagePreview} 
+                  alt="Preview" 
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+                {/* крестик для удаления */}
+                <button
+                  onClick={handleRemoveImage}
+                  className="absolute top-3 right-3 p-2 bg-black/60 hover:bg-black/80 text-white rounded-full transition-colors z-10"
+                  title="Удалить картинку"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </>
+            ) : (
+              /* если нет картинки */
+              <div className="flex flex-col items-center text-center">
+                <div className="w-16 h-16 mb-4 rounded-2xl bg-blue-50 text-[#2563EB] flex items-center justify-center">
+                  <Image className="w-8 h-8" />
+                </div>
+                <p className="text-base font-semibold text-[#64748B] mb-1">Загрузите изображение</p>
+                <p className="text-sm text-[#64748B] mb-2">Перетащите файл сюда или нажмите для выбора</p>
+                <p className="text-xs text-[#64748B]">JPG, PNG, до 5 МБ</p>
               </div>
-              <p className="text-base font-semibold text-[#64748B] mb-1">Загрузите изображение</p>
-              <p className="text-sm text-[#64748B] mb-2">Перетащите файл сюда или нажмите для выбора</p>
-              <p className="text-xs text-[#64748B]">JPG, PNG, до 5 МБ</p>
-            </div>
-            <input type="file" name="image" accept="image/png, image/jpeg" className="hidden" />
+            )}
+            
+            {/* onChange сделано специально чтоб картинка появилась */}
+            <input 
+              type="file" 
+              name="image" 
+              accept="image/png, image/jpeg" 
+              onChange={handleImageChange} 
+              className="hidden" 
+            />
           </label>
         </div>
 
@@ -201,9 +252,9 @@ export default function CreateEventPage() {
 
       {/* панель с кнопкамми */}
       <div className="flex items-center justify-between mt-12 pt-6 border-t border-gray-100">
-        <button type="button" className="text-[#2563EB] font-medium hover:underline flex items-center gap-2 ">
+        <link type="button" className="text-[#2563EB] font-medium hover:underline flex items-center gap-2 ">
           ← Отмена
-        </button>
+        </link>
         <button type="submit" className="px-6 py-3 bg-[#2563EB] text-white font-medium rounded-xl hover:bg-[#1D4ED8] transition-colors">
           Создать мероприятие
         </button>

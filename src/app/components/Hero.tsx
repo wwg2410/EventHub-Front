@@ -64,20 +64,7 @@ export default function Hero() {
 
   return (
     <section className="hero">
-      <header className="hero-header">
-        <a href="/" className="hero-logo">
-          <span>Event</span>
-          <span className="hero-logo-blue">Hub</span>
-        </a>
-
-        <nav className="hero-nav">
-          <a href="/" className="hero-nav-active">
-            Главная
-          </a>
-          <a href="#events">Мероприятия</a>
-          <a href="/create-event">Создать событие</a>
-        </nav>
-      </header>
+    
 
       <div className="hero-carousel" key={activeSlide}>
         <button
