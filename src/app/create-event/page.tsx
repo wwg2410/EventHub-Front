@@ -1,9 +1,8 @@
-// use client это директива для next.js указвает что компонент для клиентской стороны, а не серверной
 'use client';
 
 import { useState } from 'react';
 import { Image } from 'lucide-react';
-// поля с данными для формы создания мероприятия
+
 export default function CreateEventPage() {
   const [formData, setFormData] = useState({
     title: '',
@@ -17,6 +16,7 @@ export default function CreateEventPage() {
     image: null,
   });
 
+
 // обработка изменения полей формы
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -25,14 +25,30 @@ export default function CreateEventPage() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // тут обработка отправки формы, например, отправка данных на сервер
-    console.log(formData);
+    formData {
+      image: ''
+    }
+     fetch ('http://')
+     .then (res)
+     .then 
+     .catch
+
+    const response = await fetch ('URL ', {
+      method: 'POST',
+      body: dataToSend
+    }) 
+
+  
+
   }
-// return разметки страницы создания мероприятия
+
+  const handleFileChange = () => {
+    const { file } = e.target.files[0];
+    setFormData(prev => ({ ...prev, image: selectedFile}))
+  }
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
-      {/* заголовок страницы */}
-      <h1 className="text-[#0F172A] text-3xl font-bold mb-2 ">Сздайте мероприятие</h1>
+      <h1 className="text-[#0F172A] text-3xl font-bold mb-2 ">Создайте мероприятие</h1>
       <p className="text-[#64748B] mb-8">Расскажите о вашем мероприятии, чтобы привлечь участников</p>
 
       <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -78,7 +94,7 @@ export default function CreateEventPage() {
             </div>
           </div>
 
-          {/* Дата и время (в одну строку) */}
+          {/* Дата и время */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-semibold mb-2">
@@ -176,11 +192,9 @@ export default function CreateEventPage() {
 
         </div>
 
-        {/* правый блок с фотографиями  */}
-
         {/* добавление изображения */}
         <div className="space-y-2">
-          <label className="block  text[#0F172A]text-sm font-semibold mb-2">
+          <label className="block  text-[#0F172A] text-sm font-semibold mb-2">
             Изображение мероприятия <span className="text-red-500">*</span>
           </label>
 
@@ -193,7 +207,13 @@ export default function CreateEventPage() {
               <p className="text-sm text-[#64748B] mb-2">Перетащите файл сюда или нажмите для выбора</p>
               <p className="text-xs text-[#64748B]">JPG, PNG, до 5 МБ</p>
             </div>
-            <input type="file" name="image" accept="image/png, image/jpeg" className="hidden" />
+            
+            <input onChange={(e)=> {
+              if (e.target.files && e.target.files [0] {
+                const file = e.target.files[0];
+                setFormData((prev) => ({...prev, image: file }));
+              })
+            }} type="file" name="image" accept="image/png, image/jpeg" className="hidden" />
           </label>
         </div>
 
