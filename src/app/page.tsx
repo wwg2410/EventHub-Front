@@ -2,7 +2,9 @@
 import "react";
 import { useState } from 'react'
 import mockEvents from '../../db.json'
+import Hero from './components/Hero'
 import { Search, CalendarDays, MapPin, CircleDollarSign, UsersRound } from 'lucide-react';
+
 
 export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState('')
@@ -15,7 +17,7 @@ export default function HomePage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-[#FAFAFA] font-sans">
-  
+          <Hero />
       <main className="p-4 sm:p-6 md:p-[30px_20px] max-w-[1200px] mx-auto w-full box-border flex-1">
         
         <div className="mb-6 md:mb-[30px] text-center sm:text-left">
