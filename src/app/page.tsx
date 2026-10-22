@@ -8,6 +8,7 @@ export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState('')
   const eventsArray = Array.isArray(mockEvents) ? mockEvents : (mockEvents.events || []);
   const [selectedCategory, setSelectedCategory] = useState('')
+  const [sortOption, setSortOption] = useState('date-ask')
   const filteredEvents = eventsArray.filter((event: any) => {
     if (!event) return false 
 
@@ -17,8 +18,14 @@ export default function HomePage() {
     const matchesCategory = selectedCategory === '' ? true: event.category === selectedCategory;
     return matchesSearch && matchesCategory
   })
-  // const [sortedEvents, setSortedEvents] = useState ( '')
-  // const sortedEvents = eventsArray.sorted((event: any) =>
+
+     const sortedEvents = [...filteredEvents].sort((a:any, b:any) => {
+        if (sortOption === 'price-ask') {
+          return Number(a.price) - Number(b.price)
+        }
+
+     }:
+    
 
   return (
     <div className="flex flex-col min-h-screen bg-[#FAFAFA] font-sans">
