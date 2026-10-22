@@ -23,8 +23,15 @@ export default function HomePage() {
         if (sortOption === 'price-ask') {
           return Number(a.price) - Number(b.price)
         }
+        if (sortOption === 'price-desc') {
+          return Number(b.price) - Number(a.price);
+        }
+        if (sortOption === 'seats-desk' ) {
+          return Number(b.seats) - Number(a.seats);
+        }
+        return new Date(a.date).getTime() -new Date(b.date).getTime();
 
-     }:
+     });
     
 
   return (
@@ -41,9 +48,9 @@ export default function HomePage() {
           </h2>
         </div>
 
-        <div className="search-input flex flex-col md:flex-row md:items-end gap-4 md:gap-5 max-w-[900px] mb-8 md:mb-10 w-full">
+        <div className="search-input flex flex-col md:flex-row md:items-end gap-4 md:gap-5 mb-8 md:mb-10 w-full">
 
-          <div className="relative flex-1 flex flex-col gap-[6px]">
+          <div className="relative md:flex-[3] flex flex-col gap-[6px]">
             <span className="text-[#334155] text-sm font-semibold">Название</span>
             <div className="relative">
               <Search 
@@ -60,7 +67,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 md:gap-5 flex-1 w-full">
+          <div className="flex flex-col sm:flex-row gap-4 md:gap-5 md:flex-[2] w-full">
             <label htmlFor="select-category" className="flex flex-col gap-[6px] flex-1 text-[#334155] text-sm font-semibold"> 
               Все категории
               <select value= {selectedCategory} onChange = {(e) => setSelectedCategory(e.target.value)} name="category" id="select-category" className="w-full p-3 rounded-lg border border-[#CBD5E1] bg-white text-[#0F172A] text-[15px] cursor-pointer outline-none focus:border-[#2563EB] transition-colors">
@@ -79,7 +86,7 @@ export default function HomePage() {
             
             <label htmlFor="select-near" className="flex flex-col gap-[6px] flex-1 text-[#334155] text-sm font-semibold">
               Сортировка
-              <select name="near" id="select-near" className="w-full p-3 rounded-lg border border-[#CBD5E1] bg-white text-[#0F172A] text-[15px] cursor-pointer outline-none focus:border-[#2563EB] transition-colors">
+              <select value={sortOption} onChange={(e) = > setSortOption(e.target.value)} name="near" id="select-near" className="w-full p-3 rounded-lg border border-[#CBD5E1] bg-white text-[#0F172A] text-[15px] cursor-pointer outline-none focus:border-[#2563EB] transition-colors">
                 <option value="date-ask">Сначала ближайшие</option>
                 <option value="price-ask">Сначала дешевле</option>
                 <option value="price-desc">Сначала дороже</option>
