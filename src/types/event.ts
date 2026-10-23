@@ -17,3 +17,18 @@ export interface MyEventsResponse {
   created: Event[];
   registered: Event[];
 }
+
+export interface IUser{
+  name: string;
+  email: string;
+  password: string;
+  confirmPass?: string
+}
+export interface IMessage{
+  text: string;
+  color: string;
+}
+export interface ILogin{
+  email: string;
+  password: string;
+}
