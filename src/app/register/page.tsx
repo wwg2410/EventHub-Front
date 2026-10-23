@@ -1,10 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { UserRound, Mail, LockKeyhole, Eye, EyeOff } from "lucide-react";
+
 import { IMessage, IUser } from "@/types/event";
 import { RegisterUser } from "./api/register";
 import { useRouter } from "next/navigation";
+import { UserRound } from "lucide-react";
+import { Mail } from "lucide-react";
+import { LockKeyhole } from "lucide-react";
+import { EyeOff } from "lucide-react";
+import { Eye } from "lucide-react";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -12,53 +17,57 @@ export default function RegisterPage() {
     name: "",
     password: "",
     email: "",
-    confirmPass: ""
+    confirmPass: "",
   });
   const [message, setMessage] = useState<IMessage>({
     text: "",
-    color: ""
-  })
+    color: "",
+  });
 
-  function showMessage(text: string, color: string){
-    setMessage({text: text, color: color})
+  function showMessage(text: string, color: string) {
+    setMessage({ text: text, color: color });
     setTimeout(() => {
-        setMessage({text: "", color: ""})
-    }, 2000)
+      setMessage({ text: "", color: "" });
+    }, 2000);
   }
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
- async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    
-    if(!userData.name || !userData.email || !userData.password || !userData.confirmPass){
-        showMessage('Заполните пустые поля', 'red')
-        return
+
+    if (
+      !userData.name ||
+      !userData.email ||
+      !userData.password ||
+      !userData.confirmPass
+    ) {
+      showMessage("Заполните пустые поля", "red");
+      return;
     }
 
-    if(userData.password.length < 6 || userData.confirmPass.length < 6){
-        showMessage("Пароль не может быть меньшее 6 символов", 'red')
-        return
+    if (userData.password.length < 6 || userData.confirmPass.length < 6) {
+      showMessage("Пароль не может быть меньшее 6 символов", "red");
+      return;
     }
 
-    if(userData.password !== userData.confirmPass){
-        showMessage('Пароли не совпадают', 'red')
-        return
+    if (userData.password !== userData.confirmPass) {
+      showMessage("Пароли не совпадают", "red");
+      return;
     }
 
-    const newUser:IUser = {
-        name: userData.name,
-        email: userData.email,
-        password: userData.password
-    }
+    const newUser: IUser = {
+      name: userData.name,
+      email: userData.email,
+      password: userData.password,
+    };
 
-    
-    showMessage("Регистрация прошла успешна!", 'green')
+    showMessage("Регистрация прошла успешна!", "green");
     await RegisterUser(newUser);
-    setUserData({name: "", email: "", password: "", confirmPass: ""})
+    setUserData({ name: "", email: "", password: "", confirmPass: "" });
     setTimeout(() => {
-      router.push('/login')
-    }, 3000)
+      router.push("/login");
+    }, 3000);
   }
 
   const inputClass =
@@ -98,7 +107,9 @@ export default function RegisterPage() {
                 type="text"
                 placeholder="Введите ваше имя"
                 value={userData.name}
-                onChange={(e) => setUserData({...userData, name: e.target.value})}
+                onChange={(e) =>
+                  setUserData({ ...userData, name: e.target.value })
+                }
                 autoComplete="name"
                 required
                 className={inputClass}
@@ -125,7 +136,9 @@ export default function RegisterPage() {
                 type="email"
                 placeholder="example@mail.com"
                 value={userData.email}
-                onChange={(e) => setUserData({...userData, email: e.target.value})}
+                onChange={(e) =>
+                  setUserData({ ...userData, email: e.target.value })
+                }
                 autoComplete="email"
                 required
                 className={inputClass}
@@ -152,7 +165,9 @@ export default function RegisterPage() {
                 type={showPassword ? "text" : "password"}
                 placeholder="Минимум 6 символов"
                 value={userData.password}
-                onChange={(e) => setUserData({...userData, password: e.target.value})}
+                onChange={(e) =>
+                  setUserData({ ...userData, password: e.target.value })
+                }
                 autoComplete="new-password"
                 minLength={6}
                 required
@@ -189,7 +204,9 @@ export default function RegisterPage() {
                 type={showConfirmPassword ? "text" : "password"}
                 placeholder="Повторите пароль"
                 value={userData.confirmPass}
-                onChange={(e) => setUserData({...userData, confirmPass: e.target.value})}
+                onChange={(e) =>
+                  setUserData({ ...userData, confirmPass: e.target.value })
+                }
                 autoComplete="new-password"
                 minLength={6}
                 required
@@ -226,7 +243,12 @@ export default function RegisterPage() {
             Войти
           </a>
         </p>
-        <p className="text-center mt-3 font-semibold" style={{color: message.color}}>{message.text}</p>
+        <p
+          className="text-center mt-3 font-semibold"
+          style={{ color: message.color }}
+        >
+          {message.text}
+        </p>
       </div>
     </main>
   );

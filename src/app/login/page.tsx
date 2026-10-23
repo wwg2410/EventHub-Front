@@ -1,59 +1,52 @@
 "use client";
 
 import { useState } from "react";
-import {  Mail, LockKeyhole, Eye, EyeOff } from "lucide-react";
+import { Mail, LockKeyhole, Eye, EyeOff } from "lucide-react";
 import { ILogin, IMessage } from "@/types/event";
 import { useRouter } from "next/navigation";
 import { LoginUser } from "./api/login";
 export default function LoginPage() {
-  const router = useRouter()
+  const router = useRouter();
   const [userData, setUserData] = useState<ILogin>({
     password: "",
     email: "",
   });
   const [message, setMessage] = useState<IMessage>({
     text: "",
-    color: ""
-  })
+    color: "",
+  });
 
-  function showMessage(text: string, color: string){
-    setMessage({text: text, color: color})
+  function showMessage(text: string, color: string) {
+    setMessage({ text: text, color: color });
     setTimeout(() => {
-        setMessage({text: "", color: ""})
-    }, 2000)
+      setMessage({ text: "", color: "" });
+    }, 2000);
   }
   const [showPassword, setShowPassword] = useState(false);
 
- async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    
-    if(!userData.email || !userData.password ){
-        showMessage('Заполните пустые поля', 'red')
-        return
-    }
+async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  e.preventDefault();
 
-    if(!userData.email.includes("@")){
-        showMessage('Нужно написать @', 'red')
-        return
-    }
-
-    if(userData.password.length < 6){
-        showMessage("Пароль не может быть меньшее 6 символов", 'red')
-        return
-    }
-
-
-    const newUser:ILogin = {
-        email: userData.email,
-        password: userData.password
-    }
-
-    
-    showMessage("Вы успешно вошли в аккаунт", 'green')
-    await LoginUser(newUser)
-    setUserData({email: "", password: ""})
-    router.push('/')
+  if (!userData.email || !userData.password) {
+    showMessage("Заполните пустые поля", "red");
+    return;
   }
+
+  try {
+    const result = await LoginUser(userData);
+
+    if (result.user?.role === "ADMIN") {
+      router.push("/admin-panel");
+    } else {
+      router.push("/");
+    }
+  } catch (error) {
+    showMessage(
+      error instanceof Error ? error.message : "Ошибка входа",
+      "red"
+    );
+  }
+}
 
   const inputClass =
     "w-full rounded-lg border border-gray-300 bg-white py-3 pl-11 pr-4 text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10";
@@ -67,12 +60,12 @@ export default function LoginPage() {
           </h1>
 
           <p className="mt-2 text-sm font-semibold leading-6 text-gray-600">
-            Войдите в свой аккаунт, чтобы управлять мероприятиями и покупать билеты
+            Войдите в свой аккаунт, чтобы управлять мероприятиями и покупать
+            билеты
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
-
           <div>
             <label
               htmlFor="email"
@@ -92,7 +85,9 @@ export default function LoginPage() {
                 type="email"
                 placeholder="example@mail.com"
                 value={userData.email}
-                onChange={(e) => setUserData({...userData, email: e.target.value})}
+                onChange={(e) =>
+                  setUserData({ ...userData, email: e.target.value })
+                }
                 autoComplete="email"
                 required
                 className={inputClass}
@@ -119,7 +114,9 @@ export default function LoginPage() {
                 type={showPassword ? "text" : "password"}
                 placeholder="Минимум 6 символов"
                 value={userData.password}
-                onChange={(e) => setUserData({...userData, password: e.target.value})}
+                onChange={(e) =>
+                  setUserData({ ...userData, password: e.target.value })
+                }
                 autoComplete="new-password"
                 minLength={6}
                 required
@@ -136,8 +133,6 @@ export default function LoginPage() {
               </button>
             </div>
           </div>
-
-        
 
           <button
             type="submit"
@@ -156,7 +151,12 @@ export default function LoginPage() {
             Регистрация
           </a>
         </p>
-        <p className="text-center mt-3 font-semibold" style={{color: message.color}}>{message.text}</p>
+        <p
+          className="text-center mt-3 font-semibold"
+          style={{ color: message.color }}
+        >
+          {message.text}
+        </p>
       </div>
     </main>
   );
