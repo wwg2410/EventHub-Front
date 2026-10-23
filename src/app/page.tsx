@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link' // Импортируем нативный компонент Link
+import Link from 'next/link'
 import mockEvents from '../../db.json'
 import Hero from './components/Hero'
 import { Search, CalendarDays, MapPin, CircleDollarSign, UsersRound } from 'lucide-react';
@@ -46,7 +46,8 @@ export default function HomePage() {
             Афиша мероприятий
           </h1>
           <h2 className="text-[#64748B] text-base sm:text-lg font-normal m-0">
-            Открывайте интересные события рядом с вами
+            Всё самое интересное прямо рядом с вами...
+
           </h2>
         </div>
 
@@ -104,7 +105,6 @@ export default function HomePage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {sortedEvents.map((event: any) => (
             
-            /* ИСПРАВЛЕНО ТУТ: Карточка теперь обернута в компонент Link для 100% срабатывания перехода */
             <Link 
               key={event.id} 
               href={`/events/${event.id}`}
@@ -147,8 +147,7 @@ export default function HomePage() {
                   <UsersRound size={14} className="text-[#64748B] shrink-0" /> 
                   <span>Осталось мест: <strong className="text-[#0F172A]">{event.seats}</strong></span>
                 </div>
-                
-                {/* Кнопка теперь просто стилизованный div, так как за переход отвечает верхний Link */}
+          
                 <div className="w-full mt-3 bg-[#2563EB] hover:bg-[#1d4ed8] active:bg-[#1e40af] text-white h-11 rounded-lg font-semibold flex items-center justify-center transition-colors">
                   Подробнее
                 </div>
