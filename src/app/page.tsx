@@ -4,36 +4,51 @@ import { useState } from 'react'
 import Link from 'next/link'
 import mockEvents from '../../db.json'
 import Hero from './components/Hero'
-import { Search, CalendarDays, MapPin, CircleDollarSign, UsersRound } from 'lucide-react';
+import { Search, CalendarDays, MapPin, CircleDollarSign, UsersRound } from 'lucide-react'
+import type { Event, MockEventsStructure } from '@/types/event'
 
 export default function HomePage() {
-  const [searchQuery, setSearchQuery] = useState('')
-  const eventsArray = Array.isArray(mockEvents) ? mockEvents : (mockEvents.events || []);
-  const [selectedCategory, setSelectedCategory] = useState('')
-  const [sortOption, setSortOption] = useState('date-ask')
+  const [searchQuery, setSearchQuery] = useState<string>('')
+  const [selectedCategory, setSelectedCategory] = useState<string>('')
+  const [sortOption, setSortOption] = useState<string>('date-ask')
   
-  const filteredEvents = eventsArray.filter((event: any) => {
+  const ITEMS_PER_PAGE = 8
+  const [visibleCount, setVisibleCount] = useState<number>(ITEMS_PER_PAGE)
+
+  const rawEvents = mockEvents as MockEventsStructure | Event[]
+  const eventsArray: Event[] = Array.isArray(rawEvents) 
+    ? rawEvents 
+    : (rawEvents.events || [])
+
+  const filteredEvents = eventsArray.filter((event: Event) => {
     if (!event) return false 
 
     const matchesSearch = event.title 
-    ? event.title.toLowerCase().trim().includes(searchQuery.toLowerCase().trim())
-    : false;
-    const matchesCategory = selectedCategory === '' ? true: event.category === selectedCategory;
+      ? event.title.toLowerCase().trim().includes(searchQuery.toLowerCase().trim())
+      : false
+    const matchesCategory = selectedCategory === '' ? true : event.category === selectedCategory
+    
     return matchesSearch && matchesCategory
   })
 
-  const sortedEvents = [...filteredEvents].sort((a:any, b:any) => {
+  const sortedEvents = [...filteredEvents].sort((a: Event, b: Event) => {
     if (sortOption === 'price-ask') {
       return Number(a.price) - Number(b.price)
     }
     if (sortOption === 'price-desc') {
-      return Number(b.price) - Number(a.price);
+      return Number(b.price) - Number(a.price)
     }
-    if (sortOption === 'seats-desk' ) {
-      return Number(b.seats) - Number(a.seats);
+    if (sortOption === 'seats-desk') {
+      return Number(b.seats) - Number(a.seats)
     }
-    return new Date(a.date).getTime() - new Date(b.date).getTime();
-  });
+    return new Date(a.date).getTime() - new Date(b.date).getTime()
+  })
+
+  const displayedEvents = sortedEvents.slice(0, visibleCount)
+
+  const loadMore = (): void => {
+    setVisibleCount((prev) => prev + ITEMS_PER_PAGE)
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-[#FAFAFA] font-sans">
@@ -46,8 +61,7 @@ export default function HomePage() {
             Афиша мероприятий
           </h1>
           <h2 className="text-[#64748B] text-base sm:text-lg font-normal m-0">
-            Всё самое интересное прямо рядом с вами...
-
+            Всё самое интересное рядом с вами ...
           </h2>
         </div>
 
@@ -63,7 +77,10 @@ export default function HomePage() {
                 value={searchQuery}
                 type="text"
                 placeholder="Поиск мероприятий по названию...."
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  setSearchQuery(e.target.value)
+                  setVisibleCount(ITEMS_PER_PAGE)
+                }}
                 className="w-full p-[12px_12px_12px_42px] text-[15px] rounded-lg border border-[#CBD5E1] box-border text-[#0F172A] bg-white outline-none focus:border-[#2563EB] transition-colors"
               />
             </div>
@@ -72,14 +89,23 @@ export default function HomePage() {
           <div className="flex flex-col sm:flex-row gap-4 md:gap-5 md:flex-1 w-full">
             <label htmlFor="select-category" className="flex flex-col gap-[6px] flex-1 text-[#334155] text-sm font-semibold"> 
               Все категории
-              <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)} name="category" id="select-category" className="w-full p-3 rounded-lg border border-[#CBD5E1] bg-white text-[#0F172A] text-[15px] cursor-pointer outline-none focus:border-[#2563EB] transition-colors">
+              <select 
+                value={selectedCategory} 
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                  setSelectedCategory(e.target.value)
+                  setVisibleCount(ITEMS_PER_PAGE)
+                }} 
+                name="category" 
+                id="select-category" 
+                className="w-full p-3 rounded-lg border border-[#CBD5E1] bg-white text-[#0F172A] text-[15px] cursor-pointer outline-none focus:border-[#2563EB] transition-colors"
+              >
                 <option value="">Все категории</option>
                 <option value="concert">Театр и шоу</option>
                 <option value="cinema">Кино</option>
                 <option value="exhibition">Выставки и искусство</option>
                 <option value="education">Образование и лекции</option>
                 <option value="business">Бизнес и нетворкинг</option>
-                <option value="sport">Спорт и activeный отдых</option>
+                <option value="sport">Спорт и активный отдых</option>
                 <option value="gastronomy">Гастрономия</option>
                 <option value="family">Для детей и семьи</option>
                 <option value="party">Вечеринки и ночная жизнь</option>
@@ -88,7 +114,13 @@ export default function HomePage() {
             
             <label htmlFor="select-near" className="flex flex-col gap-[6px] flex-1 text-[#334155] text-sm font-semibold">
               Сортировка
-              <select value={sortOption} onChange={(e) => setSortOption(e.target.value)} name="near" id="select-near" className="w-full p-3 rounded-lg border border-[#CBD5E1] bg-white text-[#0F172A] text-[15px] cursor-pointer outline-none focus:border-[#2563EB] transition-colors">
+              <select 
+                value={sortOption} 
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSortOption(e.target.value)} 
+                name="near" 
+                id="select-near" 
+                className="w-full p-3 rounded-lg border border-[#CBD5E1] bg-white text-[#0F172A] text-[15px] cursor-pointer outline-none focus:border-[#2563EB] transition-colors"
+              >
                 <option value="date-ask">Сначала ближайшие</option>
                 <option value="price-ask">Сначала дешевле</option>
                 <option value="price-desc">Сначала дороже</option>
@@ -103,8 +135,7 @@ export default function HomePage() {
         </h2>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {sortedEvents.map((event: any) => (
-            
+          {displayedEvents.map((event: Event) => (
             <Link 
               key={event.id} 
               href={`/events/${event.id}`}
@@ -112,7 +143,7 @@ export default function HomePage() {
             >
               <div className="img-container relative w-full h-44 sm:h-40 bg-[#F1F5F9] overflow-hidden">
                 <img 
-                  src={event.imageUrl || "https://unsplash.com"} 
+                  src={event.imageUrl || event.imageUrl || "https://unsplash.com"} 
                   alt={event.title} 
                   className="w-full h-full object-cover transition-transform duration-500 ease-out hover:scale-105"
                 />
@@ -139,7 +170,7 @@ export default function HomePage() {
                 <div className="flex items-center gap-2 text-[#475569] text-[13px]">
                   <CircleDollarSign size={15} className="text-[#2563EB] shrink-0" />
                   <span className="font-bold text-[#0F172A] text-sm">
-                    {event.price === 0 || event.price === '0' ? 'Бесплатно' : `${event.price} ₽`}
+                    {Number(event.price) === 0 || event.price === '0' ? 'Бесплатно' : `${event.price} ₽`}
                   </span>
                 </div>
                 
@@ -147,7 +178,7 @@ export default function HomePage() {
                   <UsersRound size={14} className="text-[#64748B] shrink-0" /> 
                   <span>Осталось мест: <strong className="text-[#0F172A]">{event.seats}</strong></span>
                 </div>
-          
+                
                 <div className="w-full mt-3 bg-[#2563EB] hover:bg-[#1d4ed8] active:bg-[#1e40af] text-white h-11 rounded-lg font-semibold flex items-center justify-center transition-colors">
                   Подробнее
                 </div>
@@ -155,7 +186,19 @@ export default function HomePage() {
             </Link>
           ))}
         </div>
+
+        {visibleCount < sortedEvents.length && (
+          <div className="mt-10 flex justify-center">
+            <button
+              onClick={loadMore}
+              className="h-11 px-8 rounded-lg bg-white border border-[#CBD5E1] text-[#334155] font-semibold text-sm shadow-sm hover:bg-gray-50 transition-colors cursor-pointer"
+            >
+              Показать ещё
+            </button>
+          </div>
+        )}
+
       </main>
     </div>
-  );
+  )
 }
