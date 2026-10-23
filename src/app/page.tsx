@@ -9,6 +9,7 @@ export default function HomePage() {
   const eventsArray = Array.isArray(mockEvents) ? mockEvents : (mockEvents.events || []);
   const [selectedCategory, setSelectedCategory] = useState('')
   const [sortOption, setSortOption] = useState('date-ask')
+  
   const filteredEvents = eventsArray.filter((event: any) => {
     if (!event) return false 
 
@@ -19,24 +20,21 @@ export default function HomePage() {
     return matchesSearch && matchesCategory
   })
 
-     const sortedEvents = [...filteredEvents].sort((a:any, b:any) => {
-        if (sortOption === 'price-ask') {
-          return Number(a.price) - Number(b.price)
-        }
-        if (sortOption === 'price-desc') {
-          return Number(b.price) - Number(a.price);
-        }
-        if (sortOption === 'seats-desk' ) {
-          return Number(b.seats) - Number(a.seats);
-        }
-        return new Date(a.date).getTime() -new Date(b.date).getTime();
-
-     });
-    
+  const sortedEvents = [...filteredEvents].sort((a:any, b:any) => {
+    if (sortOption === 'price-ask') {
+      return Number(a.price) - Number(b.price)
+    }
+    if (sortOption === 'price-desc') {
+      return Number(b.price) - Number(a.price);
+    }
+    if (sortOption === 'seats-desk' ) {
+      return Number(b.seats) - Number(a.seats);
+    }
+    return new Date(a.date).getTime() - new Date(b.date).getTime();
+  });
 
   return (
     <div className="flex flex-col min-h-screen bg-[#FAFAFA] font-sans">
-  
       <main className="p-4 sm:p-6 md:p-[30px_20px] max-w-[1200px] mx-auto w-full box-border flex-1">
         
         <div className="mb-6 md:mb-[30px] text-center sm:text-left">
@@ -50,7 +48,7 @@ export default function HomePage() {
 
         <div className="search-input flex flex-col md:flex-row md:items-end gap-4 md:gap-5 mb-8 md:mb-10 w-full">
 
-          <div className="relative md:flex-[3] flex flex-col gap-[6px]">
+          <div className="relative md:flex-1 flex flex-col gap-[6px]">
             <span className="text-[#334155] text-sm font-semibold">Название</span>
             <div className="relative">
               <Search 
@@ -67,10 +65,10 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 md:gap-5 md:flex-[2] w-full">
+          <div className="flex flex-col sm:flex-row gap-4 md:gap-5 md:flex-1 w-full">
             <label htmlFor="select-category" className="flex flex-col gap-[6px] flex-1 text-[#334155] text-sm font-semibold"> 
               Все категории
-              <select value= {selectedCategory} onChange = {(e) => setSelectedCategory(e.target.value)} name="category" id="select-category" className="w-full p-3 rounded-lg border border-[#CBD5E1] bg-white text-[#0F172A] text-[15px] cursor-pointer outline-none focus:border-[#2563EB] transition-colors">
+              <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)} name="category" id="select-category" className="w-full p-3 rounded-lg border border-[#CBD5E1] bg-white text-[#0F172A] text-[15px] cursor-pointer outline-none focus:border-[#2563EB] transition-colors">
                 <option value="">Все категории</option>
                 <option value="concert">Театр и шоу</option>
                 <option value="cinema">Кино</option>
@@ -86,7 +84,7 @@ export default function HomePage() {
             
             <label htmlFor="select-near" className="flex flex-col gap-[6px] flex-1 text-[#334155] text-sm font-semibold">
               Сортировка
-              <select value={sortOption} onChange={(e) = > setSortOption(e.target.value)} name="near" id="select-near" className="w-full p-3 rounded-lg border border-[#CBD5E1] bg-white text-[#0F172A] text-[15px] cursor-pointer outline-none focus:border-[#2563EB] transition-colors">
+              <select value={sortOption} onChange={(e) => setSortOption(e.target.value)} name="near" id="select-near" className="w-full p-3 rounded-lg border border-[#CBD5E1] bg-white text-[#0F172A] text-[15px] cursor-pointer outline-none focus:border-[#2563EB] transition-colors">
                 <option value="date-ask">Сначала ближайшие</option>
                 <option value="price-ask">Сначала дешевле</option>
                 <option value="price-desc">Сначала дороже</option>
@@ -101,14 +99,20 @@ export default function HomePage() {
         </h2>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {filteredEvents.map((event: any) => (
+          {sortedEvents.map((event: any) => (
             
-            <div key={event.id} className="card-container flex flex-col w-full rounded-xl border border-[#E2E8F0] overflow-hidden bg-white shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)] hover:shadow-md transition-shadow">
-              <div className="img-container relative w-full h-44 sm:h-40 bg-[#F1F5F9]">
+            /* АНИМАЦИЯ ДОБАВЛЕНА ТУТ: Добавлены классы transition, hover, active и cursor-pointer */
+            <div 
+              key={event.id} 
+              onClick={() => console.log('Клик по карточке:', event.title)} // Сюда можно повесить роутер или модалку
+              className="card-container flex flex-col w-full rounded-xl border border-[#E2E8F0] overflow-hidden bg-white shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)] cursor-pointer transition-all duration-300 ease-out hover:-translate-y-1.5 hover:shadow-xl hover:border-[#2563EB]/30 active:scale-[0.98]"
+            >
+              <div className="img-container relative w-full h-44 sm:h-40 bg-[#F1F5F9] overflow-hidden">
                 <img 
                   src={event.imageUrl || "https://unsplash.com"} 
                   alt={event.title} 
-                  className="w-full h-full object-cover"
+                  /* ЭФФЕКТ НА КАРТИНКЕ: при наведении на карточку картинка плавно приближается */
+                  className="w-full h-full object-cover transition-transform duration-500 ease-out hover:scale-105"
                 />
                 <span className="absolute bottom-3 left-3 bg-[#b5cae6] p-[6px_10px] rounded-md text-[11px] font-bold text-[#2563EB] shadow-[0_2px_4px_rgba(0,0,0,0.1)]">
                   {event.category === 'concert' ? 'Концерт' : event.category === 'exhibition' ? 'Выставка' : event.category === 'sport' ? 'Спорт' : event.category}
@@ -153,3 +157,4 @@ export default function HomePage() {
     </div>
   );
 }
+
