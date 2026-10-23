@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import {
   ArrowLeft,
   ArrowRight,
-  Sparkles,
   Music2,
 } from 'lucide-react'
 
@@ -22,7 +21,7 @@ const slides = [
   {
     tag: 'Бизнес и обучение',
     image:
-      'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=1200&q=85',
+     'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=1200&q=85',
   },
 ]
 
@@ -56,13 +55,6 @@ export default function Hero() {
           <div className="grid min-h-[400px] grid-cols-1 items-center gap-5 px-5 py-8 sm:px-8 md:px-12 md:py-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-10 lg:px-14">
             {/* Левая часть Hero */}
             <div className="min-w-0">
-              <div className="mb-5 flex items-center gap-3 text-xs font-bold tracking-[0.6px] text-[#2563EB]">
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#DCE9FF]">
-                  <Sparkles size={16} />
-                </span>
-                ГЛАВНЫЕ СОБЫТИЯ
-              </div>
-
               <h1 className="m-0 text-[36px] font-extrabold leading-[1.12] tracking-[-1.5px] text-[#102447] sm:text-[44px] lg:text-[48px] xl:text-[54px]">
                 Впечатления
                 <br />
@@ -100,7 +92,7 @@ export default function Hero() {
                   key={slide.image}
                   src={slide.image}
                   alt={slide.tag}
-                  className="hero-slide-image h-full w-full object-cover transition-transform duration-700 ease-out hover:scale-105"
+                  className="h-full w-full object-cover transition-all duration-700 ease-out opacity-100 scale-100 hover:scale-105 motion-safe:animate-[fadeIn_700ms_ease-out]"
                 />
 
                 <div className="absolute inset-0 bg-gradient-to-t from-[#10244755] via-transparent to-transparent pointer-events-none" />
@@ -109,30 +101,6 @@ export default function Hero() {
                   <Music2 size={15} />
                   {slide.tag}
                 </span>
-
-                <div className="absolute bottom-3 right-3 flex items-center gap-3 rounded-full bg-white px-3 py-2 text-xs text-[#17345E] shadow-sm sm:bottom-4 sm:right-4 sm:gap-4">
-                  <span>
-                    {activeSlide + 1} / {slides.length}
-                  </span>
-
-                  <button
-                    type="button"
-                    onClick={previousSlide}
-                    aria-label="Предыдущее изображение"
-                    className="rounded-full p-1 text-[#2563EB] transition-colors hover:bg-[#DCE9FF] focus-visible:outline-2 focus-visible:outline-[#2563EB]"
-                  >
-                    <ArrowLeft size={17} />
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={nextSlide}
-                    aria-label="Следующее изображение"
-                    className="rounded-full p-1 text-[#2563EB] transition-colors hover:bg-[#DCE9FF] focus-visible:outline-2 focus-visible:outline-[#2563EB]"
-                  >
-                    <ArrowRight size={17} />
-                  </button>
-                </div>
               </div>
             </div>
           </div>
@@ -175,29 +143,6 @@ export default function Hero() {
           ))}
         </div>
       </div>
-
-      <style jsx>{`
-        .hero-slide-image {
-          animation: heroFadeIn 700ms ease-out both;
-        }
-
-        @keyframes heroFadeIn {
-          from {
-            opacity: 0.4;
-            transform: scale(1.04);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          .hero-slide-image {
-            animation: none;
-          }
-        }
-      `}</style>
     </section>
   )
 }
