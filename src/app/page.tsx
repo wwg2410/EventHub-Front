@@ -1,9 +1,10 @@
 'use client'
-import "react";
+
 import { useState } from 'react'
+import Link from 'next/link' // Импортируем нативный компонент Link
 import mockEvents from '../../db.json'
+import Hero from './components/Hero'
 import { Search, CalendarDays, MapPin, CircleDollarSign, UsersRound } from 'lucide-react';
-import Hero from "./components/Hero"
 
 export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState('')
@@ -36,7 +37,8 @@ export default function HomePage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-[#FAFAFA] font-sans">
-       <Hero/>
+      <Hero />
+
       <main className="p-4 sm:p-6 md:p-[30px_20px] max-w-[1200px] mx-auto w-full box-border flex-1">
         
         <div className="mb-6 md:mb-[30px] text-center sm:text-left">
@@ -49,7 +51,6 @@ export default function HomePage() {
         </div>
 
         <div className="search-input flex flex-col md:flex-row md:items-end gap-4 md:gap-5 mb-8 md:mb-10 w-full">
-
           <div className="relative md:flex-1 flex flex-col gap-[6px]">
             <span className="text-[#334155] text-sm font-semibold">Название</span>
             <div className="relative">
@@ -77,7 +78,7 @@ export default function HomePage() {
                 <option value="exhibition">Выставки и искусство</option>
                 <option value="education">Образование и лекции</option>
                 <option value="business">Бизнес и нетворкинг</option>
-                <option value="sport">Спорт и активный отдых</option>
+                <option value="sport">Спорт и activeный отдых</option>
                 <option value="gastronomy">Гастрономия</option>
                 <option value="family">Для детей и семьи</option>
                 <option value="party">Вечеринки и ночная жизнь</option>
@@ -103,17 +104,16 @@ export default function HomePage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {sortedEvents.map((event: any) => (
             
-            /* АНИМАЦИЯ ДОБАВЛЕНА ТУТ: Добавлены классы transition, hover, active и cursor-pointer */
-            <div 
+            /* ИСПРАВЛЕНО ТУТ: Карточка теперь обернута в компонент Link для 100% срабатывания перехода */
+            <Link 
               key={event.id} 
-              onClick={() => console.log('Клик по карточке:', event.title)} // Сюда можно повесить роутер или модалку
+              href={`/events/${event.id}`}
               className="card-container flex flex-col w-full rounded-xl border border-[#E2E8F0] overflow-hidden bg-white shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)] cursor-pointer transition-all duration-300 ease-out hover:-translate-y-1.5 hover:shadow-xl hover:border-[#2563EB]/30 active:scale-[0.98]"
             >
               <div className="img-container relative w-full h-44 sm:h-40 bg-[#F1F5F9] overflow-hidden">
                 <img 
                   src={event.imageUrl || "https://unsplash.com"} 
                   alt={event.title} 
-                  /* ЭФФЕКТ НА КАРТИНКЕ: при наведении на карточку картинка плавно приближается */
                   className="w-full h-full object-cover transition-transform duration-500 ease-out hover:scale-105"
                 />
                 <span className="absolute bottom-3 left-3 bg-[#b5cae6] p-[6px_10px] rounded-md text-[11px] font-bold text-[#2563EB] shadow-[0_2px_4px_rgba(0,0,0,0.1)]">
@@ -148,11 +148,12 @@ export default function HomePage() {
                   <span>Осталось мест: <strong className="text-[#0F172A]">{event.seats}</strong></span>
                 </div>
                 
-                <button className="w-full mt-3 bg-[#2563EB] hover:bg-[#1d4ed8] active:bg-[#1e40af] text-white h-11 rounded-lg font-semibold transition-colors">
+                {/* Кнопка теперь просто стилизованный div, так как за переход отвечает верхний Link */}
+                <div className="w-full mt-3 bg-[#2563EB] hover:bg-[#1d4ed8] active:bg-[#1e40af] text-white h-11 rounded-lg font-semibold flex items-center justify-center transition-colors">
                   Подробнее
-                </button>
+                </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </main>
