@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Image } from 'lucide-react';
+import { Image, X } from 'lucide-react';
+import Link from 'next/link';
 
 export default function CreateEventPage() {
   const [formData, setFormData] = useState({
@@ -13,15 +14,33 @@ export default function CreateEventPage() {
     category: '',
     price: '',
     seats: '',
-    image: null,
+    image: null as File | null,
   });
-
 
 // обработка изменения полей формы
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
+
+  // Обработка загрузки файла изображения
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setFormData((prev) => ({ ...prev, image: file }));
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreview(previewUrl);
+    }
+  };
+
+  // Удаление выбранной картинки
+  const handleRemoveImage = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setFormData((prev) => ({ ...prev, image: null }));
+    setImagePreview(null);
+  };
+
+
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -48,7 +67,8 @@ export default function CreateEventPage() {
   }
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
-      <h1 className="text-[#0F172A] text-3xl font-bold mb-2 ">Создайте мероприятие</h1>
+      {/* заголовок страницы */}
+      <h1 className="text-[#0F172A] text-3xl font-bold mb-2 ">Сздайте мероприятие</h1>
       <p className="text-[#64748B] mb-8">Расскажите о вашем мероприятии, чтобы привлечь участников</p>
 
       <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -192,9 +212,10 @@ export default function CreateEventPage() {
 
         </div>
 
-        {/* добавление изображения */}
+        {/* правый блок с фотографиями  */}
+
         <div className="space-y-2">
-          <label className="block  text-[#0F172A] text-sm font-semibold mb-2">
+          <label className="block  text[#0F172A]text-sm font-semibold mb-2">
             Изображение мероприятия <span className="text-red-500">*</span>
           </label>
 
@@ -207,13 +228,7 @@ export default function CreateEventPage() {
               <p className="text-sm text-[#64748B] mb-2">Перетащите файл сюда или нажмите для выбора</p>
               <p className="text-xs text-[#64748B]">JPG, PNG, до 5 МБ</p>
             </div>
-            
-            <input onChange={(e)=> {
-              if (e.target.files && e.target.files [0] {
-                const file = e.target.files[0];
-                setFormData((prev) => ({...prev, image: file }));
-              })
-            }} type="file" name="image" accept="image/png, image/jpeg" className="hidden" />
+            <input type="file" name="image" accept="image/png, image/jpeg" className="hidden" />
           </label>
         </div>
 
@@ -221,9 +236,9 @@ export default function CreateEventPage() {
 
       {/* панель с кнопкамми */}
       <div className="flex items-center justify-between mt-12 pt-6 border-t border-gray-100">
-        <button type="button" className="text-[#2563EB] font-medium hover:underline flex items-center gap-2 ">
+        <Link href="/" className="text-[#2563EB] font-medium hover:underline flex items-center gap-2 ">
           ← Отмена
-        </button>
+        </Link>
         <button type="submit" className="px-6 py-3 bg-[#2563EB] text-white font-medium rounded-xl hover:bg-[#1D4ED8] transition-colors">
           Создать мероприятие
         </button>
