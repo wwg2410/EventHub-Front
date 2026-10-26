@@ -14,15 +14,16 @@ export default function CreateEventPage() {
     address: '',
     category: '',
     price: '',
+    currency: 'KGS',
     seats: '',
     image: null as File | null,
   });
 
-const [imagePreview, setImagePreview] = useState<string | null>(null);  
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
 
 
-// обработка изменения полей формы
+  // обработка изменения полей формы
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -52,7 +53,7 @@ const [imagePreview, setImagePreview] = useState<string | null>(null);
     // тут обработка отправки формы, например, отправка данных на сервер
     console.log(formData);
   }
-// return разметки страницы создания мероприятия
+  // return разметки страницы создания мероприятия
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
       {/* заголовок страницы */}
@@ -161,92 +162,103 @@ const [imagePreview, setImagePreview] = useState<string | null>(null);
                 className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-[#2563EB]"
               >
                 <option value="">Выберите категорию</option>
-                <option value="concert">Концерт</option>
-                <option value="exhibition">Выставка</option>
-                <option value="sport">Спорт</option>
+                <option value="concert">Театр и шоу</option>
+                <option value="cinema">Кино</option>
+                <option value="exhibition">Выставки и искусство</option>
+                <option value="education">Образование и лекции</option>
+                <option value="business">Бизнес и нетворкинг</option>
+                <option value="sport">Спорт и активный отдых</option>
+                <option value="gastronomy">Гастрономия</option>
+                <option value="family">Для детей и семьи</option>
+                <option value="party">Вечеринки и ночная жизнь</option>
               </select>
             </div>
-            {/* цена билетов  */}
+
+
             <div>
               <label className="block text-sm font-semibold mb-2">
                 Цена билета <span className="text-red-500">*</span>
               </label>
-              <input
-                type="text"
-                name="price"
-                value={formData.price}
-                onChange={handleChange}
-                placeholder="Например, 500"
-                required
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-[#2563EB]"
-              />
+
+              <div className="flex gap-2">
+                {/* Поле для ввода суммы */}
+                <input
+                  type="text"
+                  name="price"
+                  value={formData.price}
+                  onChange={handleChange}
+                  placeholder="Например, 500"
+                  required
+                  className="flex-1 px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-[#2563EB]"
+                />
+              </div>
             </div>
-            {/* количество мест */}
-            <div>
-              <label className="block text-sm font-semibold mb-2">
-                Количество мест <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="number"
-                name="seats"
-                value={formData.seats}
-                onChange={handleChange}
-                placeholder="Например, 100"
-                required
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-[#2563EB]"
-              />
+              {/* количество мест */}
+              <div>
+                <label className="block text-sm font-semibold mb-2">
+                  Количество мест <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="number"
+                  name="seats"
+                  value={formData.seats}
+                  onChange={handleChange}
+                  placeholder="Например, 100"
+                  required
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-[#2563EB]"
+                />
+              </div>
             </div>
+
           </div>
 
-        </div>
+          {/* правый блок с фотографиями */}
 
-       {/* правый блок с фотографиями */}
+          <div className="space-y-2">
+            <label className="block text-[#0F172A] text-sm font-semibold mb-2">
+              Изображение мероприятия <span className="text-red-500">*</span>
+            </label>
 
-        <div className="space-y-2">
-          <label className="block text-[#0F172A] text-sm font-semibold mb-2">
-            Изображение мероприятия <span className="text-red-500">*</span>
-          </label>
-
-          <label className="relative flex flex-col items-center justify-center h-[380px] px-6 border-2 border-dashed border-gray-300 rounded-2xl cursor-pointer bg-gray-50/50 hover:bg-gray-50 transition-colors overflow-hidden">
-            {imagePreview ? (
-              <>
-                {/* Превьюшка новой картинки */}
-                <img 
-                  src={imagePreview} 
-                  alt="Preview" 
-                  className="absolute inset-0 w-full h-full object-cover"
-                />
-                {/* крестик для удаления */}
-                <button
-                  onClick={handleRemoveImage}
-                  className="absolute top-3 right-3 p-2 bg-black/60 hover:bg-black/80 text-white rounded-full transition-colors z-10"
-                  title="Удалить картинку"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </>
-            ) : (
-              /* если нет картинки */
-              <div className="flex flex-col items-center text-center">
-                <div className="w-16 h-16 mb-4 rounded-2xl bg-blue-50 text-[#2563EB] flex items-center justify-center">
-                  <Image className="w-8 h-8" />
+            <label className="relative flex flex-col items-center justify-center h-[380px] px-6 border-2 border-dashed border-gray-300 rounded-2xl cursor-pointer bg-gray-50/50 hover:bg-gray-50 transition-colors overflow-hidden">
+              {imagePreview ? (
+                <>
+                  {/* Превьюшка новой картинки */}
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                  {/* крестик для удаления */}
+                  <button
+                    onClick={handleRemoveImage}
+                    className="absolute top-3 right-3 p-2 bg-black/60 hover:bg-black/80 text-white rounded-full transition-colors z-10"
+                    title="Удалить картинку"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </>
+              ) : (
+                /* если нет картинки */
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-16 h-16 mb-4 rounded-2xl bg-blue-50 text-[#2563EB] flex items-center justify-center">
+                    <Image className="w-8 h-8" />
+                  </div>
+                  <p className="text-base font-semibold text-[#64748B] mb-1">Загрузите изображение</p>
+                  <p className="text-sm text-[#64748B] mb-2">Перетащите файл сюда или нажмите для выбора</p>
+                  <p className="text-xs text-[#64748B]">JPG, PNG, до 5 МБ</p>
                 </div>
-                <p className="text-base font-semibold text-[#64748B] mb-1">Загрузите изображение</p>
-                <p className="text-sm text-[#64748B] mb-2">Перетащите файл сюда или нажмите для выбора</p>
-                <p className="text-xs text-[#64748B]">JPG, PNG, до 5 МБ</p>
-              </div>
-            )}
-            
-            {/* onChange сделано специально чтоб картинка появилась */}
-            <input 
-              type="file" 
-              name="image" 
-              accept="image/png, image/jpeg" 
-              onChange={handleImageChange} 
-              className="hidden" 
-            />
-          </label>
-        </div>
+              )}
+
+              {/* onChange сделано специально чтоб картинка появилась */}
+              <input
+                type="file"
+                name="image"
+                accept="image/png, image/jpeg"
+                onChange={handleImageChange}
+                className="hidden"
+              />
+            </label>
+          </div>
 
       </form>
 
@@ -261,4 +273,5 @@ const [imagePreview, setImagePreview] = useState<string | null>(null);
       </div>
     </div>
   );
-}
+};
+
