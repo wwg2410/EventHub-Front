@@ -1,17 +1,18 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Search } from "lucide-react";
 
 const navigation = [
   { label: "Главная", href: "/" },
-  // TODO: подключить маршрут списка мероприятий, когда он будет добавлен.
   { label: "Мероприятия", href: "/events" },
-  // TODO: подключить страницу разработчиков, когда она будет добавлена.
   { label: "Разработчики", href: "/developers" },
 ];
 
 export default function Header() {
+  const pathname = usePathname();
+
   return (
     <header className="border-b border-slate-200 bg-white">
       <div className="mx-auto flex min-h-16 w-full max-w-[1200px] items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
@@ -29,17 +30,27 @@ export default function Header() {
           </span>
         </Link>
         <nav aria-label="Основная навигация" className="hidden items-center gap-6 sm:flex">
-          {navigation.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`relative py-5 text-sm font-medium transition-colors hover:text-blue-600 ${
-                item.href === "/events" ? "text-blue-600 after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:bg-blue-600" : "text-slate-600"
-              }`}
-            >
-              {item.label}
-            </Link>
-          ))}
+          {navigation.map((item) => {
+            const isActive =
+              item.href === "/"
+                ? pathname === "/"
+                : pathname === item.href || pathname.startsWith(`${item.href}/`);
+
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                aria-current={isActive ? "page" : undefined}
+                className={`relative py-5 text-sm font-medium transition-colors hover:text-blue-600 ${
+                  isActive
+                    ? "text-blue-600 after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:bg-blue-600"
+                    : "text-slate-600"
+                }`}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
         </nav>
         <div className="flex items-center gap-2 border-l border-slate-200 pl-4 sm:gap-3 sm:pl-6">
           <Link
