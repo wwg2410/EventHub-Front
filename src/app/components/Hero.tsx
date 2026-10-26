@@ -175,29 +175,6 @@ export default function Hero() {
           ))}
         </div>
       </div>
-
-      <style jsx>{`
-        .hero-slide-image {
-          animation: heroFadeIn 700ms ease-out both;
-        }
-
-        @keyframes heroFadeIn {
-          from {
-            opacity: 0.4;
-            transform: scale(1.04);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          .hero-slide-image {
-            animation: none;
-          }
-        }
-      `}</style>
     </section>
   )
 }
