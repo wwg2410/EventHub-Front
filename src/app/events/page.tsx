@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -33,8 +32,7 @@ export default function Event() {
       <button className="text-[blue] "> назад</button>
       <div className="mx-auto grid max-w-7xl grid-cols-1 items-start gap-7 lg:grid-cols-[1.65fr_1fr] lg:gap-12">
         <section className="min-w-0">
-        
-          <div className= "overflow-hidden rounded-xl">
+          <div className="overflow-hidden rounded-xl">
             <img
               src={event.image}
               alt="Концерт под открытым небом"
@@ -49,23 +47,21 @@ export default function Event() {
 
             <div className="space-y-4 text-base leading-7 text-gray-600 sm:text-lg">
               <p>
-                Приглашаем вас на незабываемый вечер живого джаза
-                под открытым небом! Летний джаз в Саду «Эрмитаж» —
-                это атмосфера свободы, вдохновения и прекрасной музыки.
-                Вас ждут выступления талантливых музыкантов, уютная
-                сцена в зелёном саду и особая летняя атмосфера Москвы.
+                Приглашаем вас на незабываемый вечер живого джаза под открытым
+                небом! Летний джаз в Саду «Эрмитаж» — это атмосфера свободы,
+                вдохновения и прекрасной музыки. Вас ждут выступления
+                талантливых музыкантов, уютная сцена в зелёном саду и особая
+                летняя атмосфера Москвы.
               </p>
 
               <p>
-                Возьмите с собой друзей, хорошее настроение и
-                насладитесь живым звуком в одном из самых красивых
-                садов столицы!
+                Возьмите с собой друзей, хорошее настроение и насладитесь живым
+                звуком в одном из самых красивых садов столицы!
               </p>
             </div>
           </div>
         </section>
 
-    
         <aside className="min-w-0">
           <span className="inline-block rounded-md bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700">
             {event.category}
@@ -76,9 +72,7 @@ export default function Event() {
           </h1>
 
           <div className="mt-7 space-y-5">
-            <InfoRow icon={<CalendarDays />}>
-              {event.date}
-            </InfoRow>
+            <InfoRow icon={<CalendarDays />}>{event.date}</InfoRow>
 
             <InfoRow icon={<MapPin />}>
               <div>
@@ -104,9 +98,7 @@ export default function Event() {
 
             <InfoRow icon={<UserRound />}>
               <div>
-                <p className="font-medium text-gray-800">
-                  {event.organizer}
-                </p>
+                <p className="font-medium text-gray-800">{event.organizer}</p>
                 <p className="text-sm text-gray-500">Организатор</p>
               </div>
             </InfoRow>
@@ -140,8 +132,8 @@ export default function Event() {
           <div className="mt-6 flex items-start gap-3 text-sm leading-6 text-gray-500">
             <ShieldCheck className="mt-0.5 h-7 w-7 shrink-0" />
             <p>
-              Ваши данные защищены. Запись поможет организатору
-              подготовить мероприятие.
+              Ваши данные защищены. Запись поможет организатору подготовить
+              мероприятие.
             </p>
           </div>
         </aside>
