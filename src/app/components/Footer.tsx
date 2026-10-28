@@ -1,6 +1,11 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function Footer() {
+  const pathname = usePathname();
+
   return (
     <footer className="border-t border-slate-200 bg-slate-50">
       <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-8 px-4 py-8 sm:px-6 lg:px-8">
@@ -15,12 +20,27 @@ export default function Footer() {
           <div>
             <h2 className="text-sm font-semibold text-slate-900">Навигация</h2>
             <nav aria-label="Навигация в подвале" className="mt-3 flex flex-col items-start gap-2 text-sm">
-              <Link href="/" className="text-slate-600 transition-colors hover:text-blue-600">Главная</Link>
+              <Link 
+                href="/" 
+                className={`transition-colors hover:text-blue-600 ${
+                  pathname === "/" ? "text-blue-600" : "text-slate-600"
+                }`}
+              >
+                Главная
+              </Link>
+              <Link 
+                href="/developers" 
+                className={`transition-colors hover:text-blue-600 ${
+                  pathname === "/developers" || pathname.startsWith("/developers/") ? "text-blue-600" : "text-slate-600"
+                }`}
+              >
+                Команда разработки
+              </Link>
             </nav>
           </div>
           <div>
             <h2 className="text-sm font-semibold text-slate-900">О сервисе</h2>
-            <p className="mt-3 text-sm leading-6 text-slate-500">Собираем городские события в одном удобном месте.</p>
+            <p className="mt-3 text-sm leading-6 text-slate-500">Собираем городские события in одном удобном месте.</p>
           </div>
         </div>
         <div className="flex flex-col gap-2 border-t border-slate-200 pt-5 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between">

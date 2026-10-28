@@ -1,27 +1,107 @@
 "use client";
 
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Search, UserRound } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { Search, UserRound, LogOut, Settings, LayoutDashboard, CalendarPlus, UserPlus, Menu, X } from "lucide-react";
 
 const navigation = [
   { label: "Главная", href: "/" },
   { label: "Мероприятия", href: "/events" },
-  { label: "Разработчики", href: "/developers" },
+  { label: "О проекте", href: "/about" },
+];
+
+
+const placeholderTexts = [
+  "Поиск рок-концертов...",
+  "События на этих выходных...",
+  "Куда сходить сегодня вечером?...",
+  "Выставки и мастер-классы...",
 ];
 
 export default function Header() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  interface UserType {
+    role: "ADMIN" | "USER";
+    name: string;
+  }
+
+  const user = null as any; 
+
+  const isLoggedIn = !!user;
+  const isAdmin = user?.role === "ADMIN";
+  const handleLogout = () => {
+  localStorage.removeItem("token"); 
+  window.location.href = "/"; 
+};
+
+
+
+  const [isMenuOpen, setIsMenuOpen] = useState(false); 
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false); 
+  const [searchQuery, setSearchQuery] = useState("");
+  
+  const [placeholderIndex, setPlaceholderIndex] = useState(0);
+  const [currentPlaceholder, setCurrentPlaceholder] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const menuRef = useRef<HTMLDivElement>(null);
+
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    const fullText = placeholderTexts[placeholderIndex];
+    
+    const type = () => {
+      if (!isDeleting) {
+        setCurrentPlaceholder(fullText.substring(0, currentPlaceholder.length + 1));
+        if (currentPlaceholder === fullText) {
+          timer = setTimeout(() => setIsDeleting(true), 2500); 
+        } else {
+          timer = setTimeout(type, 80); 
+        }
+      } else {
+        setCurrentPlaceholder(fullText.substring(0, currentPlaceholder.length - 1));
+        if (currentPlaceholder === "") {
+          setIsDeleting(false);
+          setPlaceholderIndex((prev) => (prev + 1) % placeholderTexts.length);
+        } else {
+          timer = setTimeout(type, 40);
+        }
+      }
+    };
+
+    timer = setTimeout(type, isDeleting ? 40 : 80);
+    return () => clearTimeout(timer);
+  }, [currentPlaceholder, isDeleting, placeholderIndex]);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) return;
+    router.push(`/events?search=${encodeURIComponent(searchQuery.trim())}`);
+  };
 
   return (
-    <header className="border-b border-slate-200 bg-white">
+    <header className="border-b border-slate-100 bg-white sticky top-0 z-50">
       <div className="mx-auto flex min-h-16 w-full max-w-[1200px] items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
         <Link
           href="/"
-          className="flex shrink-0 items-center gap-3 transition-opacity hover:opacity-80"
+          className="flex shrink-0 items-center gap-3 transition-opacity hover:opacity-90"
           aria-label="EventHub — на главную"
         >
-          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-xs font-bold text-white shadow-sm">
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-xs font-bold text-white">
             EH
           </span>
           <span>
@@ -33,7 +113,7 @@ export default function Header() {
             </span>
           </span>
         </Link>
-        <nav aria-label="Основная навигация" className="hidden items-center gap-6 sm:flex">
+        <nav aria-label="Основная навигация" className="hidden items-center gap-6 md:flex">
           {navigation.map((item) => {
             const isActive =
               item.href === "/"
@@ -56,47 +136,144 @@ export default function Header() {
             );
           })}
         </nav>
-        <div className="flex items-center gap-2 border-l border-slate-200 pl-4 sm:gap-3 sm:pl-6">
-          <Link
-            href="/events"
-            aria-label="Поиск мероприятий"
-            className="hidden rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-50 hover:text-blue-600 sm:block"
-          >
-            <Search size={18} strokeWidth={1.8} />
-          </Link>
-          <Link
-            href="/admin-panel"
-            className="hidden rounded-lg border border-blue-200 px-3 py-2 text-sm font-semibold text-blue-700 transition-colors hover:bg-blue-50 sm:inline-flex sm:px-4"
-          >
-            Админ-панель
-          </Link>
-          {/* TODO: заменить временные ссылки на маршруты авторизации после их добавления. */}
-          <Link
-            href="/login"
-            className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 hover:text-blue-600 sm:px-4"
-          >
-            Войти
-          </Link>
-          <Link
-            href="/register"
-            className="rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700 sm:px-4"
-          >
-            Регистрация
-          </Link>
-
-          <Link
-            href="/profile"
-            className="group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-xl border border-blue-400/30 bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-blue-600/25 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-indigo-600/35 active:translate-y-0 active:scale-95"
-          >
-            <span className="absolute inset-0 translate-x-[-120%] bg-linear-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-[120%]" />
-            <UserRound
-              size={18}
-              className="relative transition-transform duration-300 group-hover:rotate-[-8deg] group-hover:scale-110"
+        <div className="flex flex-1 items-center justify-end gap-3 sm:gap-4">
+          <form onSubmit={handleSearchSubmit} className="relative w-full max-w-[200px] sm:max-w-xs">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={currentPlaceholder}
+              className="w-full rounded-lg border border-slate-200 bg-slate-50/50 py-1.5 pl-9 pr-4 text-sm text-slate-900 outline-hidden transition-all focus:border-blue-600 focus:bg-white focus:ring-1 focus:ring-blue-600"
             />
-            <span className="relative">Профиль</span>
-          </Link>
+          </form>
+          <div className="relative border-l border-slate-100 pl-3 sm:pl-4" ref={menuRef}>
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="flex min-w-[90px] sm:min-w-[110px] items-center justify-center gap-2 rounded-lg bg-blue-600 px-3 sm:px-4 py-2 text-sm font-semibold text-white shadow-xs transition-colors hover:bg-blue-700"
+            >
+              <UserRound size={16} />
+              <span className="hidden sm:inline">{isLoggedIn ? "Профиль" : "Войти"}</span>
+              <span className="sm:hidden">{isLoggedIn ? "Проф." : "Вход"}</span>
+            </button>
+            {isMenuOpen && (
+              <div className="absolute right-0 mt-2 w-56 origin-top-right rounded-xl border border-slate-100 bg-white p-1 shadow-lg z-50">
+                {!isLoggedIn ? (
+                  <>
+                    <div className="p-2">
+                      <Link
+                        href="/register"
+                        onClick={() => setIsMenuOpen(false)}
+                        className="flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-blue-700"
+                      >
+                        <UserPlus size={14} />
+                        Создать аккаунт
+                      </Link>
+                    </div>
+
+                    <hr className="my-1 border-slate-100" />
+                    <Link
+                      href="/login"
+                      onClick={() => setIsMenuOpen(false)}
+                      className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-700 transition-colors hover:bg-slate-50"
+                    >
+                      <UserRound size={16} className="text-slate-400" />
+                      Войти
+                    </Link>
+                    <Link
+                      href="/login?role=admin" 
+                      onClick={() => setIsMenuOpen(false)}
+                      className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-600 transition-colors hover:bg-slate-50"
+                    >
+                      <LayoutDashboard size={16} className="text-slate-400" />
+                      Админ-панель
+                    </Link>
+                  </>
+                ) : (
+ 
+                  <>
+                    <Link
+                      href="/profile"
+                      onClick={() => setIsMenuOpen(false)}
+                      className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-700 transition-colors hover:bg-slate-50"
+                    >
+                      <UserRound size={16} className="text-slate-400" />
+                      Мой профиль
+                    </Link>
+                    {isAdmin && (
+                      <Link
+                        href="/admin-panel"
+                        onClick={() => setIsMenuOpen(false)}
+                        className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-700 transition-colors hover:bg-slate-50"
+                      >
+                        <LayoutDashboard size={16} className="text-slate-400" />
+                        Админ-панель
+                      </Link>
+                    )}
+                    <Link
+                      href="/create-event"
+                      onClick={() => setIsMenuOpen(false)}
+                      className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-700 transition-colors hover:bg-slate-50"
+                    >
+                      <CalendarPlus size={16} className="text-slate-400" />
+                      Создать событие
+                    </Link>
+                                        <Link
+                      href="/profile/settings"
+                      onClick={() => setIsMenuOpen(false)}
+                      className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-700 transition-colors hover:bg-slate-50"
+                    >
+                      <Settings size={16} className="text-slate-400" />
+                      Настройки
+                    </Link>
+                    
+                    <hr className="my-1 border-slate-100" />
+                    
+                    <button
+                      onClick={() => {
+                        setIsMenuOpen(false);
+                        handleLogout();
+                      }}
+                      className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-red-600 transition-colors hover:bg-red-50"
+                    >
+                      <LogOut size={16} />
+                      Выйти
+                    </button>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+          <button
+            onClick={() => setIsMobileNavOpen(!isMobileNavOpen)}
+            className="rounded-lg p-2 text-slate-600 transition-colors hover:bg-slate-50 md:hidden"
+            aria-label="Переключить меню"
+          >
+            {isMobileNavOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
+
         </div>
       </div>
+      {isMobileNavOpen && (
+        <div className="border-t border-slate-100 bg-white px-4 py-3 shadow-inner md:hidden">
+          <nav className="flex flex-col gap-2">
+            {navigation.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setIsMobileNavOpen(false)}
+                className={`rounded-lg px-3 py-2.5 text-base font-medium transition-colors ${
+                  pathname === item.href ? "bg-blue-50 text-blue-600" : "text-slate-600 hover:bg-slate-50"
+                }`}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
+      )}
     </header>
   );
 }
+
+
