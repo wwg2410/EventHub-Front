@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Search } from "lucide-react";
+import { Search, UserRound } from "lucide-react";
 
 const navigation = [
   { label: "Главная", href: "/" },

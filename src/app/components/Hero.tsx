@@ -51,14 +51,8 @@ export default function Hero() {
   return (
     <section className="w-full overflow-hidden bg-[#FAFAFA] text-[#0F172A]">
       <div className="mx-auto box-border w-full max-w-[1200px] px-4 pt-6 sm:px-6 md:px-5">
-        
-        {/* Группа-контейнер с классом group для интерактивного появления стрелок при наведении */}
         <div className="group relative rounded-3xl bg-gradient-to-br from-[#F1F6FF] to-[#E5EFFF] border border-[#DEE8F8]">
-          
-          {/* Сетка сбалансирована, увеличены отступы py-12 и md:py-16 */}
           <div className="grid min-h-[420px] grid-cols-1 items-center gap-8 px-6 py-12 sm:px-10 md:px-14 md:py-16 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12">
-            
-            {/* Левая часть — Теперь это полноценный уверенный заголовок */}
             <div className="min-w-0 z-10">
               <h1 className="m-0 text-[36px] font-black leading-[1.15] tracking-tight text-[#0F172A] sm:text-[42px] lg:text-[46px] xl:text-[52px]">
                 Впечатления <br className="hidden sm:inline" />
@@ -87,9 +81,7 @@ export default function Hero() {
               </div>
             </div>
 
-            {/* Правая часть — Солидный широкоформатный слайдер */}
             <div className="relative min-w-0">
-              {/* Фоновая подложка смещена для аккуратного эффекта глубины */}
               <div className="absolute -inset-2 rounded-2xl bg-[#2563EB]/5 blur-[2px]" />
 
               <div className="relative h-[240px] overflow-hidden rounded-2xl bg-[#DBEAFE] shadow-[0_12px_30px_rgba(16,36,71,0.08)] sm:h-[280px] lg:h-[320px]">
@@ -99,8 +91,6 @@ export default function Hero() {
                   alt={slide.tag}
                   className="h-full w-full object-cover transition-all duration-700 ease-out scale-100 hover:scale-105 motion-safe:animate-[fadeIn_700ms_ease-out]"
                 />
-
-                {/* Затемняющий градиент стал мягче */}
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A]/40 via-transparent to-transparent pointer-events-none" />
 
                 <span className="absolute right-4 top-4 inline-flex items-center gap-1.5 rounded-lg bg-white/90 backdrop-blur-md px-3 py-2 text-xs font-bold text-[#1E3A8A] shadow-sm border border-white/20">
@@ -111,8 +101,6 @@ export default function Hero() {
             </div>
 
           </div>
-
-          {/* Боковые стрелки — теперь они скрыты по умолчанию и плавно появляются при наведении на баннер */}
           <button
             type="button"
             onClick={previousSlide}
@@ -131,8 +119,6 @@ export default function Hero() {
             <ArrowRight size={20} />
           </button>
         </div>
-
-        {/* Индикаторы страниц */}
         <div className="flex items-center justify-center gap-2 pt-5">
           {slides.map((item, index) => (
             <button
