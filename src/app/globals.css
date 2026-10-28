@@ -7,3 +7,14 @@ body {
   padding: 0;
   background-color: #f8fafc;
 }
+
+@keyframes fadeIn {
+  from {
+    opacity: 0.4;
+    transform: scale(1.04);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

@@ -1,120 +1,103 @@
-
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import mockEvents from '../../db.json'
 import Hero from './components/Hero'
-import {
-  Search,
-  CalendarDays,
-  MapPin,
-  CircleDollarSign,
-  UsersRound,
-} from 'lucide-react'
-
-type EventItem = {
-  id: string | number
-  title: string
-  price?: number | string | null
-  date?: string
-  time?: string
-  address?: string
-  imageUrl?: string
-  category?: string
-  seats?: number | string | null
-}
+import { Search, CalendarDays, MapPin, CircleDollarSign, UsersRound } from 'lucide-react'
+import type { Event, MockEventsStructure } from '@/types/event'
 
 export default function HomePage() {
-  const [searchQuery, setSearchQuery] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState('')
-  const [sortOrder, setSortOrder] = useState('soon')
+  const [searchQuery, setSearchQuery] = useState<string>('')
+  const [selectedCategory, setSelectedCategory] = useState<string>('')
+  const [sortOption, setSortOption] = useState<string>('date-ask')
+  
+  const ITEMS_PER_PAGE = 8
+  const [visibleCount, setVisibleCount] = useState<number>(ITEMS_PER_PAGE)
 
-  const eventsArray: EventItem[] = (
-    Array.isArray(mockEvents)
-      ? mockEvents
-      : mockEvents.events || []
-  ) as EventItem[]
+  const rawEvents = mockEvents as MockEventsStructure | Event[]
+  const eventsArray: Event[] = Array.isArray(rawEvents) 
+    ? rawEvents 
+    : (rawEvents.events || [])
 
-  const filteredEvents = eventsArray
-    .filter((event) => {
-      if (!event || !event.title) return false
+  const filteredEvents = eventsArray.filter((event: Event) => {
+    if (!event) return false 
 
-      const matchesTitle = event.title
-        .toLowerCase()
-        .trim()
-        .includes(searchQuery.toLowerCase().trim())
+    const matchesSearch = event.title 
+      ? event.title.toLowerCase().trim().includes(searchQuery.toLowerCase().trim())
+      : false
+    const matchesCategory = selectedCategory === '' ? true : event.category === selectedCategory
+    
+    return matchesSearch && matchesCategory
+  })
 
-      const matchesCategory =
-        !selectedCategory || event.category === selectedCategory
+  const sortedEvents = [...filteredEvents].sort((a: Event, b: Event) => {
+    if (sortOption === 'price-ask') {
+      return Number(a.price) - Number(b.price)
+    }
+    if (sortOption === 'price-desc') {
+      return Number(b.price) - Number(a.price)
+    }
+    if (sortOption === 'seats-desk') {
+      return Number(b.seats) - Number(a.seats)
+    }
+    return new Date(a.date).getTime() - new Date(b.date).getTime()
+  })
 
-      return matchesTitle && matchesCategory
-    })
-    .sort((a, b) => {
-      if (sortOrder === 'price') {
-        return Number(a.price || 0) - Number(b.price || 0)
-      }
+  const displayedEvents = sortedEvents.slice(0, visibleCount)
 
-      if (sortOrder === 'title') {
-        return String(a.title).localeCompare(String(b.title), 'ru')
-      }
-
-      return 0
-    })
+  const loadMore = (): void => {
+    setVisibleCount((prev) => prev + ITEMS_PER_PAGE)
+  }
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#FAFAFA] font-sans">
+    <div className="flex flex-col min-h-screen bg-[#FAFAFA] font-sans">
       <Hero />
 
-      <main className="mx-auto box-border w-full max-w-[1200px] flex-1 p-4 sm:p-6 md:px-5 md:py-[30px]">
-        <div className="mb-6 text-center sm:mb-[30px] sm:text-left">
-          <h1 className="mb-2 text-2xl font-extrabold text-[#0F172A] sm:text-3xl md:text-[32px]">
+      <main className="p-4 sm:p-6 md:p-[30px_20px] max-w-[1200px] mx-auto w-full box-border flex-1">
+        
+        <div className="mb-6 md:mb-[30px] text-center sm:text-left">
+          <h1 className="text-[#0F172A] text-2xl sm:text-3xl md:text-[32px] font-extrabold mb-2 m-[0_0_8px_0]">
             Афиша мероприятий
           </h1>
-
-          <h2 className="text-base font-normal text-[#64748B] sm:text-lg">
-            Открывайте интересные события рядом с вами
+          <h2 className="text-[#64748B] text-base sm:text-lg font-normal m-0">
+            Всё самое интересное рядом с вами ...
           </h2>
         </div>
 
-        {/* Поиск и фильтры */}
-        <div className="mb-8 flex w-full max-w-[900px] flex-col gap-4 md:mb-10 md:flex-row md:items-end md:gap-5">
-          <div className="relative flex flex-1 flex-col gap-[6px]">
-            <label
-              htmlFor="event-search"
-              className="text-sm font-semibold text-[#334155]"
-            >
-              Название
-            </label>
-
+        <div className="search-input flex flex-col md:flex-row md:items-end gap-4 md:gap-5 mb-8 md:mb-10 w-full">
+          <div className="relative md:flex-1 flex flex-col gap-[6px]">
+            <span className="text-[#334155] text-sm font-semibold">Название</span>
             <div className="relative">
-              <Search
-                size={18}
-                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]"
+              <Search 
+                size={18} 
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8] pointer-events-none"
               />
-
               <input
-                id="event-search"
-                type="text"
                 value={searchQuery}
-                placeholder="Поиск мероприятий по названию..."
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="box-border w-full rounded-lg border border-[#CBD5E1] bg-white p-[12px_12px_12px_42px] text-[15px] text-[#0F172A] outline-none transition-colors focus:border-[#2563EB]"
+                type="text"
+                placeholder="Поиск мероприятий по названию...."
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  setSearchQuery(e.target.value)
+                  setVisibleCount(ITEMS_PER_PAGE)
+                }}
+                className="w-full p-[12px_12px_12px_42px] text-[15px] rounded-lg border border-[#CBD5E1] box-border text-[#0F172A] bg-white outline-none focus:border-[#2563EB] transition-colors"
               />
             </div>
           </div>
 
-          <div className="flex w-full flex-1 flex-col gap-4 sm:flex-row md:gap-5">
-            <label
-              htmlFor="select-category"
-              className="flex flex-1 flex-col gap-[6px] text-sm font-semibold text-[#334155]"
-            >
-              Категория
-
-              <select
-                id="select-category"
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="w-full cursor-pointer rounded-lg border border-[#CBD5E1] bg-white p-3 text-[15px] text-[#0F172A] outline-none focus:border-[#2563EB]"
+          <div className="flex flex-col sm:flex-row gap-4 md:gap-5 md:flex-1 w-full">
+            <label htmlFor="select-category" className="flex flex-col gap-[6px] flex-1 text-[#334155] text-sm font-semibold"> 
+              Все категории
+              <select 
+                value={selectedCategory} 
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                  setSelectedCategory(e.target.value)
+                  setVisibleCount(ITEMS_PER_PAGE)
+                }} 
+                name="category" 
+                id="select-category" 
+                className="w-full p-3 rounded-lg border border-[#CBD5E1] bg-white text-[#0F172A] text-[15px] cursor-pointer outline-none focus:border-[#2563EB] transition-colors"
               >
                 <option value="">Все категории</option>
                 <option value="concert">Театр и шоу</option>
@@ -128,145 +111,93 @@ export default function HomePage() {
                 <option value="party">Вечеринки и ночная жизнь</option>
               </select>
             </label>
-
-            <label
-              htmlFor="select-sort"
-              className="flex flex-1 flex-col gap-[6px] text-sm font-semibold text-[#334155]"
-            >
+            
+            <label htmlFor="select-near" className="flex flex-col gap-[6px] flex-1 text-[#334155] text-sm font-semibold">
               Сортировка
-
-              <select
-                id="select-sort"
-                value={sortOrder}
-                onChange={(e) => setSortOrder(e.target.value)}
-                className="w-full cursor-pointer rounded-lg border border-[#CBD5E1] bg-white p-3 text-[15px] text-[#0F172A] outline-none focus:border-[#2563EB]"
+              <select 
+                value={sortOption} 
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSortOption(e.target.value)} 
+                name="near" 
+                id="select-near" 
+                className="w-full p-3 rounded-lg border border-[#CBD5E1] bg-white text-[#0F172A] text-[15px] cursor-pointer outline-none focus:border-[#2563EB] transition-colors"
               >
-                <option value="soon">Сначала ближайшие</option>
-                <option value="price">Сначала дешевле</option>
-                <option value="title">По названию</option>
+                <option value="date-ask">Сначала ближайшие</option>
+                <option value="price-ask">Сначала дешевле</option>
+                <option value="price-desc">Сначала дороже</option>
+                <option value="seats-desk">Много мест</option>
               </select>
             </label>
           </div>
         </div>
 
-        {/* Карточки мероприятий */}
-        <h2
-          id="events"
-          className="mb-5 text-center text-xl font-bold text-[#0F172A] sm:text-left sm:text-2xl"
-        >
+        <h2 className="text-[#0F172A] text-xl sm:text-2xl font-bold mb-5 text-center sm:text-left">
           Ближайшие мероприятия
         </h2>
-
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {filteredEvents.map((event) => (
-            <article
-              key={event.id}
-              className="group relative flex h-full min-w-0 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-[transform,box-shadow,border-color] duration-300 ease-out hover:z-10 hover:scale-[1.03] hover:border-blue-200 hover:shadow-xl motion-reduce:transform-none motion-reduce:transition-none"
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {displayedEvents.map((event: Event) => (
+            <Link 
+              key={event.id} 
+              href={`/events/${event.id}`}
+              className="card-container flex flex-col w-full rounded-xl border border-[#E2E8F0] overflow-hidden bg-white shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)] cursor-pointer transition-all duration-300 ease-out hover:-translate-y-1.5 hover:shadow-xl hover:border-[#2563EB]/30 active:scale-[0.98]"
             >
-              {/* Изображение */}
-              <div className="relative h-44 w-full shrink-0 overflow-hidden bg-[#F1F5F9] sm:h-40">
-                <img
-                  src={
-                    event.imageUrl ||
-                    'https://placehold.co/600x400?text=Event'
-                  }
-                  alt={event.title}
-                  loading="lazy"
-                  className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-110 motion-reduce:transform-none motion-reduce:transition-none"
+              <div className="img-container relative w-full h-44 sm:h-40 bg-[#F1F5F9] overflow-hidden">
+                <img 
+                  src={event.imageUrl || event.imageUrl || "https://unsplash.com"} 
+                  alt={event.title} 
+                  className="w-full h-full object-cover transition-transform duration-500 ease-out hover:scale-105"
                 />
-
-                <span className="absolute bottom-3 left-3 rounded-md bg-[#b5cae6] p-[6px_10px] text-[11px] font-bold text-[#2563EB] shadow-sm">
-                  {event.category === 'concert'
-                    ? 'Концерт'
-                    : event.category === 'exhibition'
-                      ? 'Выставка'
-                      : event.category === 'sport'
-                        ? 'Спорт'
-                        : event.category === 'cinema'
-                          ? 'Кино'
-                          : event.category === 'education'
-                            ? 'Образование'
-                            : event.category === 'business'
-                              ? 'Бизнес'
-                              : event.category === 'gastronomy'
-                                ? 'Гастрономия'
-                                : event.category === 'family'
-                                  ? 'Для семьи'
-                                  : event.category === 'party'
-                                    ? 'Вечеринка'
-                                    : event.category}
+                <span className="absolute bottom-3 left-3 bg-[#b5cae6] p-[6px_10px] rounded-md text-[11px] font-bold text-[#2563EB] shadow-[0_2px_4px_rgba(0,0,0,0.1)]">
+                  {event.category === 'concert' ? 'Концерт' : event.category === 'exhibition' ? 'Выставка' : event.category === 'sport' ? 'Спорт' : event.category}
                 </span>
               </div>
-
-              {/* Информация */}
-              <div className="flex flex-1 flex-col gap-[10px] p-4">
-                <h3 className="m-0 min-h-[44px] overflow-hidden text-ellipsis text-base font-bold leading-[1.4] text-[#0F172A] line-clamp-2">
+              
+              <div className="card-main flex flex-col p-4 gap-[10px] flex-grow">
+                <h3 className="m-0 text-base font-bold text-[#0F172A] min-h-[44px] line-clamp-2 overflow-hidden leading-[1.4]">
                   {event.title}
                 </h3>
-
-                <div className="flex items-center gap-2 text-[13px] text-[#475569]">
-                  <CalendarDays
-                    size={15}
-                    className="shrink-0 text-[#2563EB]"
-                  />
-                  <span>
-                    {event.date}
-                    {event.time ? ` в ${event.time}` : ''}
+                
+                <div className="flex items-center gap-2 text-[#475569] text-[13px]">
+                  <CalendarDays size={15} className="text-[#2563EB] shrink-0" />
+                  <span>{event.date} в {event.time}</span>
+                </div>
+                
+                <div className="flex items-center gap-2 text-[#475569] text-[13px]">
+                  <MapPin size={15} className="text-[#2563EB] shrink-0" />
+                  <span className="overflow-hidden text-ellipsis whitespace-nowrap">{event.address}</span>
+                </div>
+                
+                <div className="flex items-center gap-2 text-[#475569] text-[13px]">
+                  <CircleDollarSign size={15} className="text-[#2563EB] shrink-0" />
+                  <span className="font-bold text-[#0F172A] text-sm">
+                    {Number(event.price) === 0 || event.price === '0' ? 'Бесплатно' : `${event.price} ₽`}
                   </span>
                 </div>
-
-                <div className="flex items-center gap-2 text-[13px] text-[#475569]">
-                  <MapPin size={15} className="shrink-0 text-[#2563EB]" />
-                  <span className="overflow-hidden text-ellipsis whitespace-nowrap">
-                    {event.address || 'Место уточняется'}
-                  </span>
+                
+                <div className="flex items-center gap-2 text-[#64748B] text-xs mt-auto pt-2 border-t border-[#F1F5F9]">
+                  <UsersRound size={14} className="text-[#64748B] shrink-0" /> 
+                  <span>Осталось мест: <strong className="text-[#0F172A]">{event.seats}</strong></span>
                 </div>
-
-                <div className="flex items-center gap-2 text-[13px] text-[#475569]">
-                  <CircleDollarSign
-                    size={15}
-                    className="shrink-0 text-[#2563EB]"
-                  />
-
-                  <span className="text-sm font-bold text-[#0F172A]">
-                    {event.price === 0 || event.price === '0'
-                      ? 'Бесплатно'
-                      : event.price != null
-                        ? `${event.price} ₽`
-                        : 'Цена уточняется'}
-                  </span>
-                </div>
-
-                <div className="mt-auto flex items-center gap-2 border-t border-[#F1F5F9] pt-2 text-xs text-[#64748B]">
-                  <UsersRound
-                    size={14}
-                    className="shrink-0 text-[#64748B]"
-                  />
-
-                  <span>
-                    Осталось мест:{' '}
-                    <strong className="text-[#0F172A]">
-                      {event.seats ?? 'Уточняется'}
-                    </strong>
-                  </span>
-                </div>
-
-                <button
-                  type="button"
-                  className="mt-3 h-11 w-full rounded-lg bg-[#2563EB] font-semibold text-white transition-colors hover:bg-[#1D4ED8] active:bg-[#1E40AF] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]"
-                >
+                
+                <div className="w-full mt-3 bg-[#2563EB] hover:bg-[#1d4ed8] active:bg-[#1e40af] text-white h-11 rounded-lg font-semibold flex items-center justify-center transition-colors">
                   Подробнее
-                </button>
+                </div>
               </div>
-            </article>
+            </Link>
           ))}
         </div>
 
-        {filteredEvents.length === 0 && (
-          <p className="py-10 text-center text-slate-500">
-            Мероприятия не найдены. Попробуйте изменить поиск или категорию.
-          </p>
+        {visibleCount < sortedEvents.length && (
+          <div className="mt-10 flex justify-center">
+            <button
+              onClick={loadMore}
+              className="h-11 px-8 rounded-lg bg-white border border-[#CBD5E1] text-[#334155] font-semibold text-sm shadow-sm hover:bg-gray-50 transition-colors cursor-pointer"
+            >
+              Показать ещё
+            </button>
+          </div>
         )}
+
       </main>
     </div>
   )
