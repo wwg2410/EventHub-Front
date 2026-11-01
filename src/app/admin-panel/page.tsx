@@ -1,487 +1,152 @@
-
 "use client";
 
-import { useMemo, useState } from "react";
-import type { ReactNode } from "react";
-import {
-  CalendarDays,
-  ChevronDown,
-  Edit3,
-  Filter,
-  Search,
-  Trash2,
-  Users,
-  X,
-} from "lucide-react";
+import { useState, useEffect, ReactNode } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "../context/AuthContext";
+import { CalendarDays, Users, Trash2, X } from "lucide-react";
+import EventsTable from "../components/admin/EventsTable";
+import UsersTable from "../components/admin/UsersTable";
+import type { EventItem } from "../components/admin/EventsTable";
+import type { UserItem } from "../components/admin/UsersTable";
 
-type EventStatus = "Опубликовано" | "На модерации" | "Черновик";
-
-type EventItem = {
-  id: number;
-  title: string;
-  category: string;
-  date: string;
-  author: string;
-  status: EventStatus;
-};
-
-type UserItem = {
-  id: number;
-  name: string;
-  email: string;
-  role: string;
-  status: string;
-  events: string[];
-};
-
-const initialEvents: EventItem[] = [
-  {
-    id: 1,
-    title: "Фестиваль городских историй",
-    category: "Фестивали",
-    date: "24 мая 2026",
-    author: "Анна Петрова",
-    status: "Опубликовано",
-  },
-  {
-    id: 2,
-    title: "Открытая лекция о дизайне",
-    category: "Образование",
-    date: "31 мая 2026",
-    author: "Илья Смирнов",
-    status: "На модерации",
-  },
-  {
-    id: 3,
-    title: "Вечер живой музыки",
-    category: "Концерты",
-    date: "7 июня 2026",
-    author: "Мария Орлова",
-    status: "Опубликовано",
-  },
-  {
-    id: 4,
-    title: "Забег в центре города",
-    category: "Спорт",
-    date: "14 июня 2026",
-    author: "Дмитрий Волков",
-    status: "Черновик",
-  },
-  {
-    id: 5,
-    title: "Маркет локальных брендов",
-    category: "Маркет",
-    date: "21 июня 2026",
-    author: "Ольга Ким",
-    status: "Опубликовано",
-  },
-];
-
-const demoUsers: UserItem[] = [
-  {
-    id: 1,
-    name: "Анна Петрова",
-    email: "anna@example.com",
-    role: "Пользователь",
-    status: "Активен",
-    events: ["Фестиваль городских историй"],
-  },
-  {
-    id: 2,
-    name: "Илья Смирнов",
-    email: "ilya@example.com",
-    role: "Организатор",
-    status: "Активен",
-    events: ["Открытая лекция о дизайне"],
-  },
-  {
-    id: 3,
-    name: "Мария Орлова",
-    email: "maria@example.com",
-    role: "Организатор",
-    status: "Активен",
-    events: ["Вечер живой музыки"],
-  },
-  {
-    id: 4,
-    name: "Дмитрий Волков",
-    email: "dmitry@example.com",
-    role: "Пользователь",
-    status: "Неактивен",
-    events: [],
-  },
-  {
-    id: 5,
-    name: "Ольга Ким",
-    email: "olga@example.com",
-    role: "Администратор",
-    status: "Активен",
-    events: ["Маркет локальных брендов"],
-  },
-];
-
-const categories = [
-  "Все категории",
-  "Фестивали",
-  "Образование",
-  "Концерты",
-  "Спорт",
-  "Маркет",
-];
-
-const statusStyles: Record<EventStatus, string> = {
-  Опубликовано: "bg-emerald-50 text-emerald-700 ring-emerald-600/20",
-  "На модерации": "bg-amber-50 text-amber-700 ring-amber-600/20",
-  Черновик: "bg-slate-100 text-slate-600 ring-slate-500/20",
-};
+const API_BASE_URL = "http://localhost:8080"; 
 
 export default function AdminPanelPage() {
-  const [activeTab, setActiveTab] = useState<"events" | "users">("events");
-  const [events, setEvents] = useState<EventItem[]>(initialEvents);
-  const [users] = useState<UserItem[]>(demoUsers);
+  const { user, loading } = useAuth();
+  const router = useRouter();
 
-  const [search, setSearch] = useState("");
-  const [category, setCategory] = useState(categories[0]);
-  const [userSearch, setUserSearch] = useState("");
+  const [activeTab, setActiveTab] = useState<"events" | "users">("events");
+  const [events, setEvents] = useState<EventItem[]>([]);
+  const [users, setUsers] = useState<UserItem[]>([]);
 
   const [eventToDelete, setEventToDelete] = useState<EventItem | null>(null);
   const [eventToEdit, setEventToEdit] = useState<EventItem | null>(null);
   const [editTitle, setEditTitle] = useState("");
 
-  const filteredEvents = useMemo(() => {
-    const query = search.trim().toLocaleLowerCase("ru");
+  useEffect(() => {
+    if (!loading) {
+      if (!user || user.role !== "ADMIN") {
+        router.push("/login");
+      }
+    }
+  }, [user, loading, router]);
 
-    return events.filter((event) => {
-      const matchesSearch = event.title
-        .toLocaleLowerCase("ru")
-        .includes(query);
+  const fetchEvents = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      const res = await fetch(`${API_BASE_URL}/events/all`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) setEvents(await res.json());
+    } catch (err) {
+      console.error("Ошибка загрузки мероприятий:", err);
+    }
+  };
 
-      const matchesCategory =
-        category === categories[0] || event.category === category;
+  
+  const fetchUsers = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      const res = await fetch(`${API_BASE_URL}/users/all`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) setUsers(await res.json());
+    } catch (err) {
+      console.error("Ошибка загрузки пользователей:", err);
+    }
+  };
 
-      return matchesSearch && matchesCategory;
-    });
-  }, [events, search, category]);
+  useEffect(() => {
+    if (user && user.role === "ADMIN") {
+      fetchEvents();
+      fetchUsers();
+    }
+  }, [user]);
 
-  const filteredUsers = useMemo(() => {
-    const query = userSearch.trim().toLocaleLowerCase("ru");
 
-    return users.filter((user) => {
-      const searchableText = [
-        user.name,
-        user.email,
-        user.role,
-        ...user.events,
-      ]
-        .join(" ")
-        .toLocaleLowerCase("ru");
-
-      return searchableText.includes(query);
-    });
-  }, [users, userSearch]);
-
-  function openEdit(event: EventItem) {
-    setEventToEdit(event);
-    setEditTitle(event.title);
-  }
-
-  function saveEdit() {
-    if (!eventToEdit || !editTitle.trim()) return;
-
-    setEvents((current) =>
-      current.map((event) =>
-        event.id === eventToEdit.id
-          ? { ...event, title: editTitle.trim() }
-          : event,
-      ),
-    );
-
-    setEventToEdit(null);
-  }
-
-  function deleteEvent() {
+  async function deleteEvent() {
     if (!eventToDelete) return;
+    const token = localStorage.getItem("token");
+    try {
+      const res = await fetch(`${API_BASE_URL}/events/delete/${eventToDelete.id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        setEventToDelete(null);
+        fetchEvents(); 
+      }
+    } catch (err) {
+      console.error("Ошибка удаления мероприятия:", err);
+    }
+  }
 
-    setEvents((current) =>
-      current.filter((event) => event.id !== eventToDelete.id),
-    );
+  
+  async function saveEdit() {
+    if (!eventToEdit || !editTitle.trim()) return;
+    const token = localStorage.getItem("token");
+    try {
+      const res = await fetch(`${API_BASE_URL}/events/update/${eventToEdit.id}`, {
+        method: "PUT",
+        headers: { 
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ title: editTitle.trim() }),
+      });
+      if (res.ok) {
+        setEventToEdit(null);
+        fetchEvents(); 
+      }
+    } catch (err) {
+      console.error("Ошибка обновления названия:", err);
+    }
+  }
 
-    setEventToDelete(null);
+  if (loading || !user || user.role !== "ADMIN") {
+    return <div className="flex h-screen items-center justify-center text-sm text-slate-500">Проверка прав доступа...</div>;
   }
 
   return (
     <section className="min-h-screen flex-1 bg-slate-50">
       <div className="mx-auto w-full max-w-[1200px] px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
         <div>
-          <p className="mb-2 text-sm font-semibold uppercase tracking-wide text-blue-600">
-            EventHub
-          </p>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
-            Админ-панель
-          </h1>
-          <p className="mt-3 max-w-2xl text-base leading-7 text-slate-500">
-            Управляйте мероприятиями и пользователями сервиса.
-          </p>
+          <p className="mb-2 text-sm font-semibold uppercase tracking-wide text-blue-600">EventHub</p>
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Админ-панель</h1>
+          <p className="mt-3 max-w-2xl text-base leading-7 text-slate-500">Управляйте мероприятиями и пользователями сервиса.</p>
         </div>
 
         <div className="mt-8 border-b border-slate-200">
-          <div
-            className="flex gap-6"
-            role="tablist"
-            aria-label="Разделы админ-панели"
-          >
+          <div className="flex gap-6" role="tablist" aria-label="Разделы admin-панели">
             <button
               type="button"
               role="tab"
               aria-selected={activeTab === "events"}
               onClick={() => setActiveTab("events")}
-              className={`flex items-center gap-2 border-b-2 px-1 pb-3 text-sm font-semibold transition-colors ${
-                activeTab === "events"
-                  ? "border-blue-600 text-blue-600"
-                  : "border-transparent text-slate-500 hover:text-slate-800"
-              }`}
+              className={`flex items-center gap-2 border-b-2 px-1 pb-3 text-sm font-semibold transition-colors ${activeTab === "events" ? "border-blue-600 text-blue-600" : "border-transparent text-slate-500 hover:text-slate-800"}`}
             >
-              <CalendarDays className="h-4 w-4" />
-              Мероприятия
+              <CalendarDays className="h-4 w-4" /> Мероприятия
             </button>
-
             <button
               type="button"
               role="tab"
               aria-selected={activeTab === "users"}
               onClick={() => setActiveTab("users")}
-              className={`flex items-center gap-2 border-b-2 px-1 pb-3 text-sm font-semibold transition-colors ${
-                activeTab === "users"
-                  ? "border-blue-600 text-blue-600"
-                  : "border-transparent text-slate-500 hover:text-slate-800"
-              }`}
+              className={`flex items-center gap-2 border-b-2 px-1 pb-3 text-sm font-semibold transition-colors ${activeTab === "users" ? "border-blue-600 text-blue-600" : "border-transparent text-slate-500 hover:text-slate-800"}`}
             >
-              <Users className="h-4 w-4" />
-              Пользователи
+              <Users className="h-4 w-4" /> Пользователи
             </button>
           </div>
         </div>
 
         {activeTab === "events" ? (
-          <div role="tabpanel" className="mt-6">
-            <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
-              <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-                <div className="relative min-w-0 flex-1 lg:max-w-md">
-                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                  <label htmlFor="event-search" className="sr-only">
-                    Поиск мероприятий
-                  </label>
-                  <input
-                    id="event-search"
-                    type="search"
-                    value={search}
-                    onChange={(event) => setSearch(event.target.value)}
-                    placeholder="Поиск по названию"
-                    className="h-11 w-full rounded-lg border border-slate-200 pl-10 pr-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                  />
-                </div>
-
-                <div className="flex flex-col gap-3 sm:flex-row">
-                  <div className="relative min-w-0 sm:min-w-52">
-                    <Filter className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                    <label htmlFor="event-category" className="sr-only">
-                      Категория
-                    </label>
-                    <select
-                      id="event-category"
-                      value={category}
-                      onChange={(event) => setCategory(event.target.value)}
-                      className="h-11 w-full appearance-none rounded-lg border border-slate-200 bg-white pl-10 pr-9 text-sm outline-none focus:border-blue-500"
-                    >
-                      {categories.map((item) => (
-                        <option key={item} value={item}>
-                          {item}
-                        </option>
-                      ))}
-                    </select>
-                    <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                  </div>
-
-                  <span className="flex items-center justify-center rounded-lg bg-slate-50 px-4 text-sm text-slate-500">
-                    Найдено:{" "}
-                    <strong className="ml-1 text-slate-700">
-                      {filteredEvents.length}
-                    </strong>
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-              <div className="hidden overflow-x-auto md:block">
-                <table className="w-full min-w-[780px] text-left text-sm">
-                  <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
-                    <tr>
-                      <th className="px-5 py-4">Мероприятие</th>
-                      <th className="px-4 py-4">Категория</th>
-                      <th className="px-4 py-4">Дата</th>
-                      <th className="px-4 py-4">Автор</th>
-                      <th className="px-4 py-4">Статус</th>
-                      <th className="px-5 py-4 text-right">Действия</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {filteredEvents.map((event) => (
-                      <EventRow
-                        key={event.id}
-                        event={event}
-                        onEdit={openEdit}
-                        onDelete={setEventToDelete}
-                      />
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              <div className="divide-y divide-slate-100 md:hidden">
-                {filteredEvents.map((event) => (
-                  <EventCard
-                    key={event.id}
-                    event={event}
-                    onEdit={openEdit}
-                    onDelete={setEventToDelete}
-                  />
-                ))}
-              </div>
-
-              {filteredEvents.length === 0 && (
-                <p className="px-5 py-12 text-center text-sm text-slate-500">
-                  Мероприятия не найдены.
-                </p>
-              )}
-            </div>
-          </div>
+          <EventsTable 
+            events={events} 
+            onEdit={(ev) => { setEventToEdit(ev); setEditTitle(ev.title); }} 
+            onDelete={setEventToDelete} 
+          />
         ) : (
-          <div role="tabpanel" className="mt-6">
-            <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex items-start gap-3">
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
-                    <Users className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <h2 className="text-lg font-semibold text-slate-900">
-                      Список пользователей
-                    </h2>
-                    <p className="mt-1 text-sm text-slate-500">
-                      Демонстрационные данные. Подключение к API добавим позже.
-                    </p>
-                  </div>
-                </div>
-
-                <span className="flex items-center justify-center rounded-lg bg-slate-50 px-4 py-3 text-sm text-slate-500">
-                  Найдено:{" "}
-                  <strong className="ml-1 text-slate-700">
-                    {filteredUsers.length}
-                  </strong>
-                </span>
-              </div>
-
-              <div className="relative mt-5">
-                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                <label htmlFor="user-search" className="sr-only">
-                  Поиск пользователей
-                </label>
-                <input
-                  id="user-search"
-                  type="search"
-                  value={userSearch}
-                  onChange={(event) => setUserSearch(event.target.value)}
-                  placeholder="Поиск по имени, email, роли или мероприятию"
-                  className="h-11 w-full rounded-lg border border-slate-200 pl-10 pr-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                />
-              </div>
-            </div>
-
-            <div className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-              {filteredUsers.length === 0 ? (
-                <p className="px-5 py-12 text-center text-sm text-slate-500">
-                  Пользователи не найдены.
-                </p>
-              ) : (
-                <>
-                  <div className="hidden overflow-x-auto md:block">
-                    <table className="w-full min-w-[850px] text-left text-sm">
-                      <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
-                        <tr>
-                          <th className="px-5 py-4">Пользователь</th>
-                          <th className="px-4 py-4">Email</th>
-                          <th className="px-4 py-4">Созданные мероприятия</th>
-                          <th className="px-4 py-4">Роль</th>
-                          <th className="px-5 py-4">Статус</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-100">
-                        {filteredUsers.map((user) => (
-                          <tr
-                            key={user.id}
-                            className="transition-colors hover:bg-slate-50/70"
-                          >
-                            <td className="px-5 py-4 font-semibold text-slate-900">
-                              {user.name}
-                            </td>
-                            <td className="px-4 py-4 text-slate-600">
-                              {user.email}
-                            </td>
-                            <td className="max-w-[280px] px-4 py-4 text-slate-600">
-                              {user.events.length
-                                ? user.events.join(", ")
-                                : "Нет мероприятий"}
-                            </td>
-                            <td className="px-4 py-4 text-slate-600">
-                              {user.role}
-                            </td>
-                            <td className="px-5 py-4">
-                              <UserStatusBadge status={user.status} />
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-
-                  <div className="divide-y divide-slate-100 md:hidden">
-                    {filteredUsers.map((user) => (
-                      <article key={user.id} className="p-4">
-                        <div className="flex items-start justify-between gap-3">
-                          <h3 className="font-semibold text-slate-900">
-                            {user.name}
-                          </h3>
-                          <UserStatusBadge status={user.status} />
-                        </div>
-                        <p className="mt-1 break-all text-sm text-slate-500">
-                          {user.email}
-                        </p>
-                        <dl className="mt-4 space-y-3 text-sm">
-                          <div>
-                            <dt className="text-slate-400">Роль</dt>
-                            <dd className="mt-1 text-slate-700">
-                              {user.role}
-                            </dd>
-                          </div>
-                          <div>
-                            <dt className="text-slate-400">
-                              Созданные мероприятия
-                            </dt>
-                            <dd className="mt-1 text-slate-700">
-                              {user.events.length
-                                ? user.events.join(", ")
-                                : "Нет мероприятий"}
-                            </dd>
-                          </div>
-                        </dl>
-                      </article>
-                    ))}
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
+          <UsersTable users={users} />
         )}
       </div>
 
@@ -490,27 +155,11 @@ export default function AdminPanelPage() {
           <div className="flex h-11 w-11 items-center justify-center rounded-full bg-red-50 text-red-600">
             <Trash2 className="h-5 w-5" />
           </div>
-          <h2 className="mt-4 text-lg font-semibold text-slate-900">
-            Удалить мероприятие?
-          </h2>
-          <p className="mt-2 text-sm leading-6 text-slate-500">
-            «{eventToDelete.title}» будет удалено из демонстрационного списка.
-          </p>
+          <h2 className="mt-4 text-lg font-semibold text-slate-900">Удалить мероприятие?</h2>
+          <p className="mt-2 text-sm leading-6 text-slate-500">«{eventToDelete.title}» будет безвозвратно удалено из базы данных.</p>
           <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-            <button
-              type="button"
-              onClick={() => setEventToDelete(null)}
-              className="rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
-            >
-              Отмена
-            </button>
-            <button
-              type="button"
-              onClick={deleteEvent}
-              className="rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-700"
-            >
-              Удалить
-            </button>
+            <button type="button" onClick={() => setEventToDelete(null)} className="rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50">Отмена</button>
+            <button type="button" onClick={deleteEvent} className="rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-700">Удалить</button>
           </div>
         </Dialog>
       )}
@@ -518,48 +167,14 @@ export default function AdminPanelPage() {
       {eventToEdit && (
         <Dialog onClose={() => setEventToEdit(null)}>
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-slate-900">
-              Редактировать мероприятие
-            </h2>
-            <button
-              type="button"
-              onClick={() => setEventToEdit(null)}
-              aria-label="Закрыть"
-              className="rounded-lg p-2 text-slate-400 hover:bg-slate-50 hover:text-slate-700"
-            >
-              <X className="h-5 w-5" />
-            </button>
+            <h2 className="text-lg font-semibold text-slate-900">Редактировать мероприятие</h2>
+            <button type="button" onClick={() => setEventToEdit(null)} className="rounded-lg p-2 text-slate-400 hover:bg-slate-50 hover:text-slate-700"><X className="h-5 w-5" /></button>
           </div>
-
-          <label
-            htmlFor="edit-event-title"
-            className="mt-5 block text-sm font-semibold text-slate-700"
-          >
-            Название
-          </label>
-          <input
-            id="edit-event-title"
-            value={editTitle}
-            onChange={(event) => setEditTitle(event.target.value)}
-            className="mt-2 h-11 w-full rounded-lg border border-slate-200 px-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-          />
-
+          <label htmlFor="edit-event-title" className="mt-5 block text-sm font-semibold text-slate-700">Название</label>
+          <input id="edit-event-title" value={editTitle} onChange={(e) => setEditTitle(e.target.value)} className="mt-2 h-11 w-full rounded-lg border border-slate-200 px-3 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100 focus:outline-hidden" />
           <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-            <button
-              type="button"
-              onClick={() => setEventToEdit(null)}
-              className="rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
-            >
-              Отмена
-            </button>
-            <button
-              type="button"
-              onClick={saveEdit}
-              disabled={!editTitle.trim()}
-              className="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              Сохранить
-            </button>
+            <button type="button" onClick={() => setEventToEdit(null)} className="rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50">Отмена</button>
+            <button type="button" onClick={saveEdit} disabled={!editTitle.trim()} className="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50">Сохранить</button>
           </div>
         </Dialog>
       )}
@@ -567,150 +182,10 @@ export default function AdminPanelPage() {
   );
 }
 
-function EventRow({
-  event,
-  onEdit,
-  onDelete,
-}: {
-  event: EventItem;
-  onEdit: (event: EventItem) => void;
-  onDelete: (event: EventItem) => void;
-}) {
+function Dialog({ children, onClose }: { children: ReactNode; onClose: () => void }) {
   return (
-    <tr className="transition-colors hover:bg-slate-50/70">
-      <td className="max-w-[260px] px-5 py-4 font-semibold text-slate-900">
-        {event.title}
-      </td>
-      <td className="px-4 py-4 text-slate-600">{event.category}</td>
-      <td className="whitespace-nowrap px-4 py-4 text-slate-600">
-        {event.date}
-      </td>
-      <td className="px-4 py-4 text-slate-600">{event.author}</td>
-      <td className="px-4 py-4">
-        <StatusBadge status={event.status} />
-      </td>
-      <td className="px-5 py-4">
-        <Actions event={event} onEdit={onEdit} onDelete={onDelete} />
-      </td>
-    </tr>
-  );
-}
-
-function EventCard({
-  event,
-  onEdit,
-  onDelete,
-}: {
-  event: EventItem;
-  onEdit: (event: EventItem) => void;
-  onDelete: (event: EventItem) => void;
-}) {
-  return (
-    <article className="p-4">
-      <div className="flex items-start justify-between gap-3">
-        <h2 className="font-semibold leading-6 text-slate-900">
-          {event.title}
-        </h2>
-        <StatusBadge status={event.status} />
-      </div>
-      <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-        <div>
-          <dt className="text-slate-400">Категория</dt>
-          <dd className="mt-0.5 text-slate-700">{event.category}</dd>
-        </div>
-        <div>
-          <dt className="text-slate-400">Дата</dt>
-          <dd className="mt-0.5 text-slate-700">{event.date}</dd>
-        </div>
-        <div>
-          <dt className="text-slate-400">Автор</dt>
-          <dd className="mt-0.5 text-slate-700">{event.author}</dd>
-        </div>
-      </dl>
-      <div className="mt-4 border-t border-slate-100 pt-3">
-        <Actions event={event} onEdit={onEdit} onDelete={onDelete} />
-      </div>
-    </article>
-  );
-}
-
-function StatusBadge({ status }: { status: EventStatus }) {
-  return (
-    <span
-      className={`inline-flex whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ring-inset ${statusStyles[status]}`}
-    >
-      {status}
-    </span>
-  );
-}
-
-function UserStatusBadge({ status }: { status: string }) {
-  const styles =
-    status === "Активен"
-      ? "bg-emerald-50 text-emerald-700"
-      : status === "Неактивен" || status === "Заблокирован"
-        ? "bg-red-50 text-red-700"
-        : "bg-slate-100 text-slate-600";
-
-  return (
-    <span
-      className={`inline-flex whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-semibold ${styles}`}
-    >
-      {status}
-    </span>
-  );
-}
-
-function Actions({
-  event,
-  onEdit,
-  onDelete,
-}: {
-  event: EventItem;
-  onEdit: (event: EventItem) => void;
-  onDelete: (event: EventItem) => void;
-}) {
-  return (
-    <div className="flex flex-wrap items-center justify-end gap-1">
-      <button
-        type="button"
-        onClick={() => onEdit(event)}
-        className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-xs font-semibold text-slate-600 hover:bg-blue-50 hover:text-blue-700"
-      >
-        <Edit3 className="h-3.5 w-3.5" />
-        Редактировать
-      </button>
-      <button
-        type="button"
-        onClick={() => onDelete(event)}
-        className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-xs font-semibold text-slate-600 hover:bg-red-50 hover:text-red-700"
-      >
-        <Trash2 className="h-3.5 w-3.5" />
-        Удалить
-      </button>
-    </div>
-  );
-}
-
-function Dialog({
-  children,
-  onClose,
-}: {
-  children: ReactNode;
-  onClose: () => void;
-}) {
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-4"
-      role="presentation"
-      onMouseDown={onClose}
-    >
-      <div
-        role="dialog"
-        aria-modal="true"
-        className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl"
-        onMouseDown={(event) => event.stopPropagation()}
-      >
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-4" onMouseDown={onClose}>
+      <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl" onMouseDown={(e) => e.stopPropagation()}>
         {children}
       </div>
     </div>

@@ -3,14 +3,14 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Search, UserRound, LogOut, Settings, LayoutDashboard, CalendarPlus, UserPlus, Menu, X } from "lucide-react";
+import { Search, UserRound, LogOut, Settings, LayoutDashboard, CalendarPlus, UserPlus, Menu, X, ShieldAlert } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
 
 const navigation = [
   { label: "Главная", href: "/" },
   { label: "Мероприятия", href: "/events" },
   { label: "О проекте", href: "/about" },
 ];
-
 
 const placeholderTexts = [
   "Поиск рок-концертов...",
@@ -23,21 +23,15 @@ export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
 
-  interface UserType {
-    role: "ADMIN" | "USER";
-    name: string;
-  }
+  // Получаем данные авторизации из нашего глобального контекста
+  const { user, isLoggedIn, logout } = useAuth();
+  
+  // Приводим к верхнему регистру, чтобы избежать ошибок с "admin" / "ADMIN" из базы данных
+  const isAdmin = user?.role?.toUpperCase() === "ADMIN";
 
-  const user = null as any; 
-
-  const isLoggedIn = !!user;
-  const isAdmin = user?.role === "ADMIN";
   const handleLogout = () => {
-  localStorage.removeItem("token"); 
-  window.location.href = "/"; 
-};
-
-
+    logout();
+  };
 
   const [isMenuOpen, setIsMenuOpen] = useState(false); 
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false); 
@@ -49,7 +43,7 @@ export default function Header() {
 
   const menuRef = useRef<HTMLDivElement>(null);
 
-
+  // Эффект печатающегося и стирающегося текста в плейсхолдере
   useEffect(() => {
     let timer: NodeJS.Timeout;
     const fullText = placeholderTexts[placeholderIndex];
@@ -77,6 +71,7 @@ export default function Header() {
     return () => clearTimeout(timer);
   }, [currentPlaceholder, isDeleting, placeholderIndex]);
 
+  // Закрытие меню при клике по любому другому месту экрана
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -96,6 +91,8 @@ export default function Header() {
   return (
     <header className="border-b border-slate-100 bg-white sticky top-0 z-50">
       <div className="mx-auto flex min-h-16 w-full max-w-[1200px] items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+        
+        {/* Логотип */}
         <Link
           href="/"
           className="flex shrink-0 items-center gap-3 transition-opacity hover:opacity-90"
@@ -113,6 +110,8 @@ export default function Header() {
             </span>
           </span>
         </Link>
+
+        {/* Десктопное меню навигации */}
         <nav aria-label="Основная навигация" className="hidden items-center gap-6 md:flex">
           {navigation.map((item) => {
             const isActive =
@@ -136,6 +135,8 @@ export default function Header() {
             );
           })}
         </nav>
+
+        {/* Правая часть: Умный поиск и кнопка аккаунта */}
         <div className="flex flex-1 items-center justify-end gap-3 sm:gap-4">
           <form onSubmit={handleSearchSubmit} className="relative w-full max-w-[200px] sm:max-w-xs">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
@@ -144,9 +145,11 @@ export default function Header() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={currentPlaceholder}
-              className="w-full rounded-lg border border-slate-200 bg-slate-50/50 py-1.5 pl-9 pr-4 text-sm text-slate-900 outline-hidden transition-all focus:border-blue-600 focus:bg-white focus:ring-1 focus:ring-blue-600"
+              className="w-full rounded-lg border border-slate-200 bg-slate-50/50 py-1.5 pl-9 pr-4 text-sm text-slate-900 outline-none transition-all focus:border-blue-600 focus:bg-white focus:ring-1 focus:ring-blue-600"
             />
           </form>
+
+          {/* Кнопка аккаунта */}
           <div className="relative border-l border-slate-100 pl-3 sm:pl-4" ref={menuRef}>
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -156,42 +159,53 @@ export default function Header() {
               <span className="hidden sm:inline">{isLoggedIn ? "Профиль" : "Войти"}</span>
               <span className="sm:hidden">{isLoggedIn ? "Проф." : "Вход"}</span>
             </button>
+
+            {/* Выпадающее меню */}
             {isMenuOpen && (
               <div className="absolute right-0 mt-2 w-56 origin-top-right rounded-xl border border-slate-100 bg-white p-1 shadow-lg z-50">
                 {!isLoggedIn ? (
+                  /* МЕНЮ ДЛЯ НЕАВТОРИЗОВАННОГО ПОЛЬЗОВАТЕЛЯ (ГОСТЬ) */
                   <>
                     <div className="p-2">
                       <Link
                         href="/register"
                         onClick={() => setIsMenuOpen(false)}
-                        className="flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-blue-700"
+                        className="flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-3 py-2.5 text-xs font-semibold text-white transition-colors hover:bg-blue-700"
                       >
                         <UserPlus size={14} />
                         Создать аккаунт
                       </Link>
                     </div>
-
+                    
                     <hr className="my-1 border-slate-100" />
+                    
+                    {/* Обычный вход для пользователя */}
                     <Link
                       href="/login"
                       onClick={() => setIsMenuOpen(false)}
                       className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-700 transition-colors hover:bg-slate-50"
                     >
                       <UserRound size={16} className="text-slate-400" />
-                      Войти
+                      Войти как пользователь
                     </Link>
+                    
+                    {/* Вход специально для администратора */}
                     <Link
-                      href="/login?role=admin" 
+                      href="/login?role=admin"
                       onClick={() => setIsMenuOpen(false)}
-                      className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-600 transition-colors hover:bg-slate-50"
+                      className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-amber-600 bg-amber-50/40 transition-colors hover:bg-amber-50"
                     >
-                      <LayoutDashboard size={16} className="text-slate-400" />
-                      Админ-панель
+                      <LayoutDashboard size={16} className="text-amber-500" />
+                      Вход для админа
                     </Link>
                   </>
                 ) : (
- 
+                  /* МЕНЮ ДЛЯ АВТОРИЗОВАННОГО ПОЛЬЗОВАТЕЛЯ */
                   <>
+                    <div className="px-3 py-2 text-xs font-semibold text-slate-400 border-b border-slate-50 mb-1">
+                      Привет, {user?.name || "Пользователь"}
+                    </div>
+
                     <Link
                       href="/profile"
                       onClick={() => setIsMenuOpen(false)}
@@ -200,16 +214,18 @@ export default function Header() {
                       <UserRound size={16} className="text-slate-400" />
                       Мой профиль
                     </Link>
+                                        {/* Кнопка админ-панели (показывается только если роль ADMIN) */}
                     {isAdmin && (
                       <Link
                         href="/admin-panel"
                         onClick={() => setIsMenuOpen(false)}
-                        className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-700 transition-colors hover:bg-slate-50"
+                        className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50/50 transition-colors hover:bg-blue-50"
                       >
-                        <LayoutDashboard size={16} className="text-slate-400" />
+                        <LayoutDashboard size={16} className="text-blue-500" />
                         Админ-панель
                       </Link>
                     )}
+
                     <Link
                       href="/create-event"
                       onClick={() => setIsMenuOpen(false)}
@@ -218,7 +234,8 @@ export default function Header() {
                       <CalendarPlus size={16} className="text-slate-400" />
                       Создать событие
                     </Link>
-                                        <Link
+
+                    <Link
                       href="/profile/settings"
                       onClick={() => setIsMenuOpen(false)}
                       className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-700 transition-colors hover:bg-slate-50"
@@ -226,9 +243,9 @@ export default function Header() {
                       <Settings size={16} className="text-slate-400" />
                       Настройки
                     </Link>
-                    
+
                     <hr className="my-1 border-slate-100" />
-                    
+
                     <button
                       onClick={() => {
                         setIsMenuOpen(false);
@@ -244,6 +261,7 @@ export default function Header() {
               </div>
             )}
           </div>
+          
           <button
             onClick={() => setIsMobileNavOpen(!isMobileNavOpen)}
             className="rounded-lg p-2 text-slate-600 transition-colors hover:bg-slate-50 md:hidden"
@@ -251,9 +269,10 @@ export default function Header() {
           >
             {isMobileNavOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
-
         </div>
       </div>
+
+      {/* Выдвижное мобильное меню */}
       {isMobileNavOpen && (
         <div className="border-t border-slate-100 bg-white px-4 py-3 shadow-inner md:hidden">
           <nav className="flex flex-col gap-2">
@@ -275,5 +294,3 @@ export default function Header() {
     </header>
   );
 }
-
-

@@ -13,7 +13,7 @@ const tabs: { id: Tab; label: string }[] = [
   { id: "registered", label: "Я записан" },
 ];
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
 
 function getAuthHeaders() {
   const token = localStorage.getItem("token");

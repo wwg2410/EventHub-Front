@@ -35,8 +35,6 @@ const team = [
 export default function AboutPage() {
   return (
     <main className="mx-auto max-w-[1200px] px-4 py-12 sm:px-6 lg:px-8">
-      
-      {/* Главный блок / Секция Intro */}
       <div className="max-w-3xl">
         <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl">
           О проекте <span className="text-blue-600">EventHub</span>
@@ -45,8 +43,6 @@ export default function AboutPage() {
           <strong className="text-slate-900 font-semibold">EventHub</strong> — это современный навигатор по городской культуре и развлечениям. Наша цель — объединить организаторов крутых событий и активных жителей в единую, удобную экосистему. Мы избавляем от необходимости искать анонсы в десятках разных каналов и соцсетей.
         </p>
       </div>
-
-      {/* Секция преимуществ / Особенности */}
       <div className="mt-16 border-t border-slate-100 pt-12">
         <h2 className="text-2xl font-bold tracking-tight text-slate-900">Почему выбирают нас</h2>
         <div className="mt-8 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
@@ -61,8 +57,6 @@ export default function AboutPage() {
           ))}
         </div>
       </div>
-
-      {/* Команда разработки */}
       <div className="mt-16 border-t border-slate-100 pt-12">
         <div className="flex items-center gap-3">
           <Users className="h-6 w-6 text-blue-600" />
@@ -84,8 +78,6 @@ export default function AboutPage() {
           ))}
         </div>
       </div>
-
-      {/* Призыв к действию (CTA) */}
       <div className="mt-16 rounded-2xl bg-slate-50 p-8 text-center sm:p-12">
         <h3 className="text-xl font-bold text-slate-900 sm:text-2xl">Готовы найти своё идеальное событие?</h3>
         <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-slate-500">

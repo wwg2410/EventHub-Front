@@ -16,10 +16,28 @@ export default function HomePage() {
   const ITEMS_PER_PAGE = 8
   const [visibleCount, setVisibleCount] = useState<number>(ITEMS_PER_PAGE)
 
+  
   const rawEvents = mockEvents as any
   const eventsArray: Event[] = Array.isArray(rawEvents) 
     ? rawEvents 
     : (rawEvents.events || [])
+
+  
+  const getCategoryLabel = (category: string | undefined) => {
+    if (!category) return 'Другое'
+    const categoriesMap: Record<string, string> = {
+      concert: 'Концерты',
+      exhibition: 'Выставки',
+      theater: 'Театр',
+      cinema: 'Кино',
+      festival: 'Фестивали',
+      education: 'Лекции',
+      sport: 'Спорт',
+      family: 'Детям',
+      other: 'Другое'
+    }
+    return categoriesMap[category] || category
+  }
 
   const formatPrice = (price: number | string | undefined) => {
     const numPrice = Number(price)
@@ -49,6 +67,7 @@ export default function HomePage() {
     e.currentTarget.src = '/placeholder.png'
   }
 
+ 
   const filteredEvents = eventsArray.filter((event: Event) => {
     if (!event) return false 
 
@@ -60,6 +79,7 @@ export default function HomePage() {
     return matchesSearch && matchesCategory
   })
 
+  
   const sortedEvents = [...filteredEvents].sort((a: Event, b: Event) => {
     if (sortOption === 'price-ask') {
       return (Number(a.price) || 0) - (Number(b.price) || 0)
@@ -94,6 +114,7 @@ export default function HomePage() {
           </h2>
         </div>
 
+       
         <div className="search-input flex flex-col md:flex-row md:items-end gap-4 md:gap-5 mb-8 md:mb-10 w-full">
           <div className="relative md:flex-1 flex flex-col gap-[6px]">
             <span className="text-[#334155] text-sm font-semibold">Название</span>
@@ -178,6 +199,7 @@ export default function HomePage() {
           Ближайшие мероприятия
         </h2>
         
+
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {displayedEvents.map((event: Event) => (
             <Link 
@@ -192,8 +214,9 @@ export default function HomePage() {
                   onError={handleImageError}
                   className="w-full h-full object-cover transition-transform duration-500 ease-out hover:scale-105"
                 />
+                               
                 <span className="absolute bottom-3 left-3 bg-[#2563EB]/10 p-[6px_10px] rounded-md text-[11px] font-bold text-[#2563EB] backdrop-blur-sm">
-                  {event.category}
+                  {getCategoryLabel(event.category)}
                 </span>
               </div>
               
@@ -211,7 +234,8 @@ export default function HomePage() {
                   <MapPin size={15} className="text-[#2563EB] shrink-0" />
                   <span className="overflow-hidden text-ellipsis whitespace-nowrap">{event.address || 'Место уточняется'}</span>
                 </div>
-                                <div className="flex items-center gap-2 text-[#475569] text-[13px]">
+
+                <div className="flex items-center gap-2 text-[#475569] text-[13px]">
                   <CircleDollarSign size={15} className="text-[#2563EB] shrink-0" />
                   <span className="font-bold text-[#0F172A] text-sm">
                     {formatPrice(event.price)}
@@ -230,6 +254,7 @@ export default function HomePage() {
             </Link>
           ))}
         </div>
+
 
         {hasMore && (
           <div className="mt-10 flex justify-center">
