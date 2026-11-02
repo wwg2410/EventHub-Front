@@ -1,13 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import mockEvents from '../../db.json'
 import Hero from './components/Hero'
 import { Search, CalendarDays, MapPin, CircleDollarSign, UsersRound } from 'lucide-react'
 import type { Event } from '@/types/event'
 
 export default function HomePage() {
+  const [eventsArray, setEventsArray] = useState<Event[]>([])
   const [searchQuery, setSearchQuery] = useState<string>('')
   const [selectedCategory, setSelectedCategory] = useState<string>('')
   const [sortOption, setSortOption] = useState<string>('date-ask')
@@ -16,12 +16,18 @@ export default function HomePage() {
   const ITEMS_PER_PAGE = 8
   const [visibleCount, setVisibleCount] = useState<number>(ITEMS_PER_PAGE)
 
-  
-  const rawEvents = mockEvents as any
-  const eventsArray: Event[] = Array.isArray(rawEvents) 
-    ? rawEvents 
-    : (rawEvents.events || [])
-
+  useEffect(() => {
+    fetch('http://localhost:8080/events/all')
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setEventsArray(data)
+        } else if (data && Array.isArray(data.events)) {
+          setEventsArray(data.events)
+        }
+      })
+      .catch((err) => console.error(err))
+  }, [])
   
   const getCategoryLabel = (category: string | undefined) => {
     if (!category) return 'Другое'
@@ -67,7 +73,6 @@ export default function HomePage() {
     e.currentTarget.src = '/placeholder.png'
   }
 
- 
   const filteredEvents = eventsArray.filter((event: Event) => {
     if (!event) return false 
 
@@ -79,7 +84,6 @@ export default function HomePage() {
     return matchesSearch && matchesCategory
   })
 
-  
   const sortedEvents = [...filteredEvents].sort((a: Event, b: Event) => {
     if (sortOption === 'price-ask') {
       return (Number(a.price) || 0) - (Number(b.price) || 0)
@@ -114,7 +118,6 @@ export default function HomePage() {
           </h2>
         </div>
 
-       
         <div className="search-input flex flex-col md:flex-row md:items-end gap-4 md:gap-5 mb-8 md:mb-10 w-full">
           <div className="relative md:flex-1 flex flex-col gap-[6px]">
             <span className="text-[#334155] text-sm font-semibold">Название</span>
@@ -199,9 +202,8 @@ export default function HomePage() {
           Ближайшие мероприятия
         </h2>
         
-
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {displayedEvents.map((event: Event) => (
+          {displayedEvents.map((event: any) => (
             <Link 
               key={event.id} 
               href={`/events/${event.id}`}
@@ -209,7 +211,7 @@ export default function HomePage() {
             >
               <div className="img-container relative w-full h-44 sm:h-40 bg-[#F1F5F9] overflow-hidden">
                 <img 
-                  src={event.imageUrl || '/placeholder.png'} 
+                  src={event.image || '/placeholder.png'} 
                   alt={event.title} 
                   onError={handleImageError}
                   className="w-full h-full object-cover transition-transform duration-500 ease-out hover:scale-105"
@@ -220,7 +222,7 @@ export default function HomePage() {
                 </span>
               </div>
               
-              <div className="card-main flex flex-col p-4 gap-[10px] flex-grow">
+                           <div className="card-main flex flex-col p-4 gap-[10px] flex-grow">
                 <h3 className="m-0 text-base font-bold text-[#0F172A] min-h-[44px] line-clamp-2 overflow-hidden leading-[1.4]">
                   {event.title}
                 </h3>
@@ -244,7 +246,7 @@ export default function HomePage() {
                 
                 <div className="flex items-center gap-2 text-[#64748B] text-xs mt-auto pt-2 border-t border-[#F1F5F9]">
                   <UsersRound size={14} className="text-[#64748B] shrink-0" /> 
-                  <span>Осталось мест: <strong className="text-[#0F172A]">{event.seats !== undefined && event.seats !== null ? event.seats : 'уточняется'}</strong></span>
+                  <span>Осталось мест: <strong className="text-[#0F172A]">{event.capacity !== undefined && event.capacity !== null ? event.capacity : 'уточняется'}</strong></span>
                 </div>
                 
                 <div className="w-full mt-3 bg-[#2563EB] hover:bg-[#1d4ed8] active:bg-[#1e40af] text-white h-11 rounded-lg font-semibold flex items-center justify-center transition-colors">
@@ -254,7 +256,6 @@ export default function HomePage() {
             </Link>
           ))}
         </div>
-
 
         {hasMore && (
           <div className="mt-10 flex justify-center">

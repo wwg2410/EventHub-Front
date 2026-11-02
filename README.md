@@ -1,5 +1,40 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Environment Variables Configuration
+
+> ⚠️ **IMPORTANT:** Never commit your local `.env` or `.env.local` files containing real passwords and secret keys to GitHub. 
+
+### 1. Local Configuration
+To run this application locally, you must create an environment configuration file in the root directory of the project:
+
+* Create a file named **`.env`** (or **`.env.local`**) in the root folder.
+* Add your local connection links and environment configurations.
+
+Example of what your local `.env` should look like:
+```env
+NEXT_PUBLIC_API_URL=http://localhost:8080
+JWT_SECRET=your-custom-dev-secret-key
+JWT_EXPIRES_IN=1d
+DATABASE_URL=postgresql://username:password@localhost:5432/eventhub_db
+```
+
+### 2. Git Protection
+Ensure that your secret configuration files are ignored by Git. Check your **`.gitignore`** file in the root directory and confirm it contains the following lines:
+
+```text
+# local env files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+```
+
+### 3. Sharing an Environment Template
+To help other developers set up the project without exposing real credentials, an **`.env.example`** file is provided in the repository. If you add new configuration variables, make sure to document them there with placeholder values.
+
+---
+
 ## Getting Started
 
 First, run the development server:

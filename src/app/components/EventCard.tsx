@@ -9,6 +9,15 @@ interface Props {
 }
 
 export default function EventCard({ event, onEdit, onDelete }: Props) {
+  const formatTime = (dateStr: string) => {
+    try {
+      const date = new Date(dateStr);
+      return date.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" });
+    } catch {
+      return "";
+    }
+  };
+
   return (
     <article className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
       <div className="min-w-0">
@@ -19,10 +28,10 @@ export default function EventCard({ event, onEdit, onDelete }: Props) {
         )}
         <h3 className="font-semibold text-gray-900 text-base">{event.title}</h3>
         <p className="text-sm text-gray-500 mt-1">
-          {formatDate(event.date)}, {event.time} &bull; {event.address}
+          {formatDate(event.date)}{event.date ? `, ${formatTime(event.date)}` : ""} &bull; {event.address}
         </p>
         <p className="text-sm text-gray-500 mt-0.5">
-          {event.price > 0 ? `${event.price} сом` : "Бесплатно"} &bull; мест: {event.seats}
+          {Number(event.price) > 0 ? `${event.price} сом` : "Бесплатно"} &bull; мест: {(event as any).capacity ?? event.seats ?? "уточняется"}
         </p>
       </div>
 

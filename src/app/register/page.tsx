@@ -268,7 +268,7 @@ import { LockKeyhole } from "lucide-react";
 import { EyeOff } from "lucide-react";
 import { Eye } from "lucide-react";
 
-// Локальное расширение интерфейса для поддержки выбора роли при тестировании
+
 interface IUserWithRole extends IUser {
   role?: "USER" | "ADMIN";
 }
@@ -323,7 +323,7 @@ export default function RegisterPage() {
       name: userData.name,
       email: userData.email,
       password: userData.password,
-      role: userData.role, // Передаем выбранную роль на бэкенд NestJS
+      role: userData.role, 
     };
 
     try {
@@ -497,7 +497,7 @@ export default function RegisterPage() {
             </div>
           </div>
 
-          {/* ПОЛЕ ВЫБОРА РОЛИ — Стилизовано точно под общую сетку */}
+          
           <div>
             <label
               htmlFor="role"

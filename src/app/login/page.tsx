@@ -179,14 +179,18 @@ import { useAuth } from "../context/AuthContext";
 export default function LoginPage() {
   const router = useRouter();
   const { login } = useAuth();
+  
   const [userData, setUserData] = useState<ILogin>({
     password: "",
     email: "",
   });
+  
   const [message, setMessage] = useState<IMessage>({
     text: "",
     color: "",
   });
+
+  const [showPassword, setShowPassword] = useState(false);
 
   function showMessage(text: string, color: string) {
     setMessage({ text: text, color: color });
@@ -194,28 +198,22 @@ export default function LoginPage() {
       setMessage({ text: "", color: "" });
     }, 2000);
   }
-  const [showPassword, setShowPassword] = useState(false);
 
-  // Функция для быстрой авторизации под админом (до отправки формы)
+  // Быстрый вход администратора
   const handleQuickAdminLogin = () => {
-    // 1. Подставляем тестовые или стандартные данные админа в стейт
     const adminCredentials = {
-      email: "admin@mail.com", // Укажите здесь реальный email вашего админа
-      password: "adminpassword", // Укажите здесь реальный пароль вашего админа
+      email: "admin@mail.com", 
+      password: "adminpassword", 
     };
     
+    // Обновляем поля формы визуально
     setUserData(adminCredentials);
 
-    // 2. Создаем фейковое событие отправки, чтобы вызвать handleSubmit
-    const mockEvent = {
-      preventDefault: () => {},
-    } as React.FormEvent<HTMLFormElement>;
-
-    // 3. Вызываем отправку формы с новыми данными вручную
+    // Передаем данные админа НАПРЯМУЮ, минуя асинхронный стейт React
     processLogin(adminCredentials);
   };
 
-  // Вынесли логику запроса в отдельную функцию для удобства вызова из разных мест
+  // Единая функция авторизации
   async function processLogin(credentials: ILogin) {
     if (!credentials.email || !credentials.password) {
       showMessage("Заполните пустые поля", "red");
@@ -223,9 +221,11 @@ export default function LoginPage() {
     }
 
     try {
+      // Отправляем на сервер актуальные credentials (аргумент функции)
       const result = await LoginUser(credentials);
       const token = result.access_token;
 
+      // Запрашиваем профиль для проверки роли
       const profileRes = await fetch("http://localhost:8080/auth/profile", {
         method: "GET",
         headers: {
@@ -243,6 +243,7 @@ export default function LoginPage() {
         login(token, user);
       }
 
+      // Редирект в зависимости от роли из базы данных
       if (user?.role === "ADMIN") {
         router.push("/admin-panel");
       } else {
@@ -256,6 +257,7 @@ export default function LoginPage() {
     }
   }
 
+  // Отправка обычной формы пользователем
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     await processLogin(userData);
@@ -273,8 +275,7 @@ export default function LoginPage() {
           </h1>
 
           <p className="mt-2 text-sm font-semibold leading-6 text-gray-600">
-            Войдите в свой аккаунт, чтобы управлять мероприятиями и покупать
-            билеты
+            Войдите в свой аккаунт, чтобы управлять мероприятиями и покупать билеты
           </p>
         </div>
 
@@ -330,7 +331,7 @@ export default function LoginPage() {
                 onChange={(e) =>
                   setUserData({ ...userData, password: e.target.value })
                 }
-                autoComplete="new-password"
+                autoComplete="current-password"
                 minLength={6}
                 required
                 className={`${inputClass} pr-11`}
@@ -355,7 +356,6 @@ export default function LoginPage() {
           </button>
         </form>
 
-        {/* Разделительная линия для красоты */}
         <div className="relative my-6">
           <div className="absolute inset-0 flex items-center" aria-hidden="true">
             <div className="w-full border-t border-gray-200"></div>
@@ -365,7 +365,6 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* КНОПКА ДЛЯ АДМИНА ДО АВТОРИЗАЦИИ */}
         <button
           type="button"
           onClick={handleQuickAdminLogin}
@@ -384,6 +383,7 @@ export default function LoginPage() {
             Регистрация
           </a>
         </p>
+        
         <p
           className="text-center mt-3 font-semibold"
           style={{ color: message.color }}
