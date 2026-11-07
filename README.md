@@ -1,77 +1,148 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# EventHub
 
-## Environment Variables Configuration
+## О проекте
 
-> ⚠️ **IMPORTANT:** Never commit your local `.env` or `.env.local` files containing real passwords and secret keys to GitHub. 
+**EventHub** — это веб-приложение для поиска, просмотра и управления мероприятиями. Платформа позволяет пользователям знакомиться с интересными событиями, создавать собственные мероприятия и сохранять понравившиеся.
 
-### 1. Local Configuration
-To run this application locally, you must create an environment configuration file in the root directory of the project:
+Проект разработан с использованием современных веб-технологий.
 
-* Create a file named **`.env`** (or **`.env.local`**) in the root folder.
-* Add your local connection links and environment configurations.
+## Основные возможности
 
-Example of what your local `.env` should look like:
+- Просмотр списка мероприятий.
+- Просмотр подробной информации о мероприятиях.
+- Регистрация и авторизация пользователей.
+- Создание мероприятий.
+- Просмотр личного профиля.
+- Просмотр своих мероприятий.
+- Управление мероприятиями.
+- Административная панель для управления пользователями и событиями.
+- Страницы с информацией о проекте и разработчиках.
+
+## Технологии
+
+В проекте используются:
+
+- **Next.js 16** — React-фреймворк для разработки веб-приложений.
+- **React 19** — библиотека для создания пользовательского интерфейса.
+- **TypeScript** — типизированный JavaScript.
+- **Tailwind CSS 4** — стилизация интерфейса.
+- **Redux Toolkit** — управление состоянием приложения.
+- **React Redux** — связь Redux с React.
+- **Lucide React** — иконки.
+
+## Установка и запуск
+
+### 1. Клонирование репозитория
+
+```bash
+git clone https://github.com/wwg2410/EventHub-Front.git
+```
+
+### 2. Переход в папку проекта
+
+```bash
+cd EventHub-Front
+```
+
+### 3. Установка зависимостей
+
+```bash
+npm install
+```
+
+### 4. Настройка переменных окружения
+
+Создайте файл `.env.local` в корневой папке проекта.
+
+Добавьте необходимые переменные Cloudinary:
+
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:8080
-JWT_SECRET=your-custom-dev-secret-key
-JWT_EXPIRES_IN=1d
-DATABASE_URL=postgresql://username:password@localhost:5432/eventhub_db
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=your-cloud-name
+NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET=your-upload-preset
 ```
 
-### 2. Git Protection
-Ensure that your secret configuration files are ignored by Git. Check your **`.gitignore`** file in the root directory and confirm it contains the following lines:
+Замените значения на свои данные Cloudinary.
 
-```text
-# local env files
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-```
-
-### 3. Sharing an Environment Template
-To help other developers set up the project without exposing real credentials, an **`.env.example`** file is provided in the repository. If you add new configuration variables, make sure to document them there with placeholder values.
-
----
-
-## Getting Started
-
-First, run the development server:
+### 5. Запуск проекта
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+После запуска откройте приложение в браузере:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+http://localhost:3000
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Другие команды
 
-## Learn More
+Проверка проекта:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run lint
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Сборка проекта:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm run build
+```
 
-## Deploy on Vercel
+Запуск собранного проекта:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+npm run start
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Структура проекта
 
-## Backend documentation 
- Swagger http://localhost:8080/api
- link for github:
- https://github.com/legenda0123red-sys/EventHub-Back.git
- 
+```text
+EventHub-Front/
+│
+├── public/
+│
+├── src/
+│   ├── app/
+│   │   ├── about/
+│   │   ├── admin-panel/
+│   │   ├── components/
+│   │   │   └── admin/
+│   │   ├── context/
+│   │   ├── create-event/
+│   │   ├── developers/
+│   │   ├── events/
+│   │   ├── login/
+│   │   ├── my-events/
+│   │   ├── profile/
+│   │   ├── register/
+│   │   ├── globals.css
+│   │   ├── layout.tsx
+│   │   └── page.tsx
+│   │
+│   ├── types/
+│   └── utils/
+│
+├── .env.example
+├── .gitignore
+├── package.json
+├── package-lock.json
+├── tsconfig.json
+└── README.md
+```
+
+## Backend
+
+Backend проекта разработан отдельно.
+
+**GitHub репозиторий:**
+
+https://github.com/legenda0123red-sys/EventHub-Back.git
+
+**Swagger API Documentation:**
+
+http://localhost:8080/api
+
+Для работы с backend необходимо предварительно запустить сервер.
+
+## Разработка
+
+Проект EventHub создан в рамках командной разработки веб-приложения для организации и управления мероприятиями.
