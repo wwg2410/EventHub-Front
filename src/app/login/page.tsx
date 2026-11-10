@@ -4,7 +4,13 @@ import { useState } from "react";
 import { Mail, LockKeyhole, Eye, EyeOff } from "lucide-react";
 import { ILogin, IMessage } from "@/types/event";
 import { useRouter } from "next/navigation";
+<<<<<<< Updated upstream
 import { LoginUser } from "./api/login";
+=======
+import { LoginUser } from "../../entities/user/api/login";
+import { useAuth } from "../context/AuthContext";
+
+>>>>>>> Stashed changes
 export default function LoginPage() {
   const router = useRouter();
   const [userData, setUserData] = useState<ILogin>({
