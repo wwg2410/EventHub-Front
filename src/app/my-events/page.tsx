@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import EventCard from "../components/EventCard";
-import EditEventModal from "../components/EditEvents";
-import DeleteEventModal from "../components/DeleteEvents";
+import EventCard from "@/entities/event";
+import EditEventModal from "@/features/edit-event";
+import DeleteEventModal from "@/features/delite-event";
 import type { Event, EventFormData, MyEventsResponse } from "@/types/event";
 
 type Tab = "created" | "registered";
@@ -13,8 +13,12 @@ const tabs: { id: Tab; label: string }[] = [
   { id: "registered", label: "Я записан" },
 ];
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
 
+function getAuthHeaders() {
+  const token = localStorage.getItem("token");
+  return { Authorization: `Bearer ${token}` };
+}
 export default function MyEventsPage() {
   const [tab, setTab] = useState<Tab>("created");
   const [data, setData] = useState<MyEventsResponse>({ created: [], registered: [] });
@@ -29,10 +33,10 @@ export default function MyEventsPage() {
   useEffect(() => {
     const controller = new AbortController();
 
-    fetch(`${API_URL}/users/me/events`, {
-      credentials: "include",
-      signal: controller.signal,
-    })
+fetch(`${API_URL}/users/me/events`, {
+  headers: getAuthHeaders(),
+  signal: controller.signal,
+})
       .then((res) => {
         if (!res.ok) throw new Error("request failed");
         return res.json() as Promise<MyEventsResponse>;
@@ -67,8 +71,7 @@ export default function MyEventsPage() {
     try {
       const res = await fetch(`${API_URL}/events/${editing.id}`, {
         method: "PATCH",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...getAuthHeaders() },
         body: JSON.stringify(values),
       });
       if (!res.ok) throw new Error("request failed");
@@ -92,7 +95,7 @@ export default function MyEventsPage() {
     try {
       const res = await fetch(`${API_URL}/events/${deleting.id}`, {
         method: "DELETE",
-        credentials: "include",
+        headers: getAuthHeaders(),
       });
       if (!res.ok) throw new Error("request failed");
       setData((prev) => ({
