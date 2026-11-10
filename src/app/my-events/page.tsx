@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import EventCard from "../components/EventCard";
-import EditEventModal from "../components/EditEvents";
-import DeleteEventModal from "../components/DeleteEvents";
+import EventCard from "@/entities/event";
+import EditEventModal from "@/features/edit-event";
+import DeleteEventModal from "@/features/delite-event";
 import type { Event, EventFormData, MyEventsResponse } from "@/types/event";
 
 type Tab = "created" | "registered";

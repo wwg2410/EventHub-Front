@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Modal from "../../../shared/ui/Modal";
+import Modal from "@/shared/ui/Modal";
 import type { Event, EventFormData } from "@/types/event";
 
 interface Props {

@@ -1,6 +1,6 @@
 "use client";
 
-import Modal from "../../../shared/ui/Modal";
+import Modal from "@/shared/ui/Modal";
 import type { Event } from "@/types/event";
 
 interface Props {
