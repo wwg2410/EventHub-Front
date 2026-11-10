@@ -167,7 +167,7 @@
 "use client";
 
 import { useState } from "react";
-import Modal from "./Modal";
+import Modal from "@/shared/ui/Modal";
 import type { Event, EventFormData } from "@/types/event";
 
 interface Props {
@@ -195,7 +195,7 @@ export default function EditEventModal({
     address: event.address ?? "",
     category: event.category ?? "",
     price: String(event.price ?? "0"),
-    seats: String((event as any).capacity ?? event.seats ?? "1"),
+    seats: String(event.capacity ?? event.seats ?? "1"),
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -210,7 +210,7 @@ export default function EditEventModal({
       price: Number(form.price),
       capacity: Number(form.seats),
       seats: Number(form.seats),
-    } as any);
+    });
   };
 
   return (

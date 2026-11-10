@@ -8,6 +8,7 @@ export interface Event {
   category: string;
   price: number;
   seats: number;
+  capacity?: number;
   imageUrl?: string | null;
 }
 

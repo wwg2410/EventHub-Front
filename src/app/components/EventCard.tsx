@@ -1,5 +1,5 @@
 import { Pencil, Trash2 } from "lucide-react";
-import { formatDate } from "@/utils/format-date";
+import { formatDate } from "@/shared/utils/format-date";
 import type { Event } from "@/types/event";
 
 interface Props {
@@ -31,7 +31,7 @@ export default function EventCard({ event, onEdit, onDelete }: Props) {
           {formatDate(event.date)}{event.date ? `, ${formatTime(event.date)}` : ""} &bull; {event.address}
         </p>
         <p className="text-sm text-gray-500 mt-0.5">
-          {Number(event.price) > 0 ? `${event.price} сом` : "Бесплатно"} &bull; мест: {(event as any).capacity ?? event.seats ?? "уточняется"}
+          {Number(event.price) > 0 ? `${event.price} сом` : "Бесплатно"} &bull; мест: {event.capacity ?? event.seats ?? "уточняется"}
         </p>
       </div>
 

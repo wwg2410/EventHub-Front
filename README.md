@@ -57,11 +57,12 @@ npm install
 Добавьте необходимые переменные Cloudinary:
 
 ```env
+NEXT_PUBLIC_API_URL=http://localhost:8080
 NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=your-cloud-name
 NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET=your-upload-preset
 ```
 
-Замените значения на свои данные Cloudinary.
+Укажите адрес backend и замените значения Cloudinary на данные своего аккаунта.
 
 ### 5. Запуск проекта
 
