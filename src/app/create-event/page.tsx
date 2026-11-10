@@ -968,6 +968,20 @@ export default function CreateEventPage() {
       </div>
     </div>
   );
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
 }
 
 

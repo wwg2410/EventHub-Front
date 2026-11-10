@@ -171,20 +171,20 @@
 
 import { useState } from "react";
 import { Mail, LockKeyhole, Eye, EyeOff, ShieldCheck } from "lucide-react";
+
 import { ILogin, IMessage } from "@/types/event";
 import { useRouter } from "next/navigation";
-import { LoginUser } from "./api/login";
+import { LoginUser } from "../../entities/user/api/login";
 import { useAuth } from "../context/AuthContext";
-
 export default function LoginPage() {
   const router = useRouter();
   const { login } = useAuth();
-  
+
   const [userData, setUserData] = useState<ILogin>({
     password: "",
     email: "",
   });
-  
+
   const [message, setMessage] = useState<IMessage>({
     text: "",
     color: "",
@@ -202,10 +202,10 @@ export default function LoginPage() {
   // Быстрый вход администратора
   const handleQuickAdminLogin = () => {
     const adminCredentials = {
-      email: "admin@mail.com", 
-      password: "adminpassword", 
+      email: "admin@mail.com",
+      password: "adminpassword",
     };
-    
+
     // Обновляем поля формы визуально
     setUserData(adminCredentials);
 
@@ -252,7 +252,7 @@ export default function LoginPage() {
     } catch (error) {
       showMessage(
         error instanceof Error ? error.message : "Ошибка входа",
-        "red"
+        "red",
       );
     }
   }
@@ -275,7 +275,8 @@ export default function LoginPage() {
           </h1>
 
           <p className="mt-2 text-sm font-semibold leading-6 text-gray-600">
-            Войдите в свой аккаунт, чтобы управлять мероприятиями и покупать билеты
+            Войдите в свой аккаунт, чтобы управлять мероприятиями и покупать
+            билеты
           </p>
         </div>
 
@@ -357,7 +358,10 @@ export default function LoginPage() {
         </form>
 
         <div className="relative my-6">
-          <div className="absolute inset-0 flex items-center" aria-hidden="true">
+          <div
+            className="absolute inset-0 flex items-center"
+            aria-hidden="true"
+          >
             <div className="w-full border-t border-gray-200"></div>
           </div>
           <div className="relative flex justify-center text-sm font-medium leading-6">
@@ -383,7 +387,7 @@ export default function LoginPage() {
             Регистрация
           </a>
         </p>
-        
+
         <p
           className="text-center mt-3 font-semibold"
           style={{ color: message.color }}

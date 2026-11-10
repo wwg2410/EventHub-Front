@@ -260,7 +260,7 @@
 import { useState } from "react";
 
 import { IMessage, IUser } from "@/types/event";
-import { RegisterUser } from "./api/register";
+import { RegisterUser } from "../../shared/api/register";
 import { useRouter } from "next/navigation";
 import { UserRound } from "lucide-react";
 import { Mail } from "lucide-react";
